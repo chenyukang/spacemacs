@@ -128,7 +128,7 @@ values."
    ;; with `:variables' keyword (similar to layers). Check the editing styles
    ;; section of the documentation for details on available variables.
    ;; (default 'vim)
-   dotspacemacs-editing-style 'emacs
+   dotspacemacs-editing-style 'hybrid
    ;; If non nil output loading progress in `*Messages*' buffer. (default nil)
    dotspacemacs-verbose-loading nil
    ;; Specify the startup banner. Default value is `official', it displays
@@ -510,7 +510,7 @@ you should place your code here."
   (setq ruby-insert-encoding-magic-comment nil)
 
   (require 'company)
-  (global-company-mode)
+  (global-company-mode)()
   (add-hook 'cider-repl-mode-hook #'company-mode)
   (add-hook 'cider-mode-hook #'company-mode)
   (add-hook 'cider-repl-mode-hook #'cider-company-enable-fuzzy-completion)
@@ -556,6 +556,30 @@ you should place your code here."
           (concat "sh-" buffer-name))))))
 
   (defalias 'os 'open-eshell)
+  (define-key evil-normal-state-map (kbd "C-f") 'forward-char)
+  (define-key evil-normal-state-map (kbd "C-b") 'backward-char)
+  (define-key evil-normal-state-map (kbd "C-a") 'beginning-of-line)
+  (define-key evil-normal-state-map (kbd "C-e") 'end-of-line)
+  (define-key evil-normal-state-map (kbd "C-n") 'next-line)
+  (define-key evil-normal-state-map (kbd "C-p") 'previous-line)
+  (define-key evil-normal-state-map (kbd "C-v") 'scroll-up-command)
+
+  (define-key evil-motion-state-map (kbd "C-f") 'forward-char)
+  (define-key evil-motion-state-map (kbd "C-b") 'backward-char)
+  (define-key evil-motion-state-map (kbd "C-a") 'beginning-of-line)
+  (define-key evil-motion-state-map (kbd "C-e") 'end-of-line)
+  (define-key evil-motion-state-map (kbd "C-n") 'next-line)
+  (define-key evil-motion-state-map (kbd "C-p") 'previous-line)
+  (define-key evil-motion-state-map (kbd "C-v") 'scroll-up-command)
+  (global-set-key (kbd "C-,") 'scroll-down-command)
+
+  (defun backto-evil-normal-state()
+    (interactive)
+    (progn
+      (save-buffer)
+      (evil-normal-state)))
+  (global-set-key (kbd "C-i") 'backto-evil-normal-state)
+  (defalias 'n 'backto-evil-normal-state)
 
   )
 
@@ -571,8 +595,6 @@ you should place your code here."
  '(ahs-idle-interval 0.25)
  '(ahs-idle-timer 0 t)
  '(ahs-inhibit-face-list nil)
- '(ansi-color-names-vector
-   ["#3F3F3F" "#CC9393" "#7F9F7F" "#F0DFAF" "#8CD0D3" "#DC8CC3" "#93E0E3" "#DCDCCC"])
  '(company-auto-complete-chars (quote (32 41 46 34 47 124 33)))
  '(company-completion-started-hook (quote (ignore)))
  '(company-idle-delay 0.2)
@@ -610,4 +632,4 @@ you should place your code here."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(font-lock-comment-face ((t (:background "gray26" :foreground "#7F9F7F")))))
