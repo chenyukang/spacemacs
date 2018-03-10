@@ -31,6 +31,10 @@ values."
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
    '(
+     erlang
+     html
+     lua
+     nginx
      javascript
      go
      clojure
@@ -80,6 +84,7 @@ values."
                                       helm-anything
                                       slim-mode
                                       coffee-mode
+                                      nginx-mode lua-mode 
                                       highlight-symbol
                                       )
    ;; A list of packages that cannot be updated.
@@ -340,7 +345,7 @@ explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
 
   (setq powerline-default-separator nil)
-  ;;(golden-ratio-mode 1)
+  (golden-ratio-mode 1)
   (global-evil-search-highlight-persist -1)
   (ido-vertical-mode -1)
 
@@ -455,6 +460,9 @@ you should place your code here."
 
   (require 'flymake-ruby)
   (add-hook 'ruby-mode-hook 'flymake-ruby-load)
+
+  (add-hook 'dired-mode-hook
+            (lambda () (local-set-key (kbd "r") 'dired-up-directory)))
 
   (autoload 'inf-ruby-minor-mode "inf-ruby" "Run an inferior Ruby process" t)
   (add-hook 'ruby-mode-hook 'inf-ruby-minor-mode)
@@ -573,6 +581,8 @@ you should place your code here."
   (define-key evil-motion-state-map (kbd "C-v") 'scroll-up-command)
   (global-set-key (kbd "C-,") 'scroll-down-command)
 
+  (define-key dired-mode-map (kbd "r") 'dired-up-directory)
+
   (defun backto-evil-normal-state()
     (interactive)
     (progn
@@ -580,7 +590,7 @@ you should place your code here."
       (evil-normal-state)))
   (global-set-key (kbd "C-i") 'backto-evil-normal-state)
   (defalias 'n 'backto-evil-normal-state)
-
+  (global-set-key (kbd "TAB") 'indent-for-tab-command)
   )
 
 ;; Do not write anything past this comment. This is where Emacs will
@@ -590,15 +600,15 @@ you should place your code here."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(ahs-case-fold-search nil)
- '(ahs-default-range (quote ahs-range-whole-buffer))
- '(ahs-idle-interval 0.25)
+ '(ahs-case-fold-search nil t)
+ '(ahs-default-range (quote ahs-range-whole-buffer) t)
+ '(ahs-idle-interval 0.25 t)
  '(ahs-idle-timer 0 t)
- '(ahs-inhibit-face-list nil)
+ '(ahs-inhibit-face-list nil t)
  '(company-auto-complete-chars (quote (32 41 46 34 47 124 33)))
- '(company-completion-started-hook (quote (ignore)))
- '(company-idle-delay 0.2)
- '(company-minimum-prefix-length 1)
+ '(company-completion-started-hook (quote (ignore)) t)
+ '(company-idle-delay 0.2 t)
+ '(company-minimum-prefix-length 1 t)
  '(company-occurrence-weight-function (quote company-occurrence-prefer-any-closest))
  '(company-show-numbers nil)
  '(company-transformers (quote (company-sort-by-occurrence)))
@@ -626,7 +636,7 @@ you should place your code here."
      ("#eee8d5" . 100))))
  '(package-selected-packages
    (quote
-    (pytest pyenv-mode py-isort pip-requirements live-py-mode hy-mode helm-pydoc cython-mode company-anaconda anaconda-mode pythonic fuzzy dash-functional tern clojure-snippets auto-complete livid-mode skewer-mode simple-httpd json-snatcher json-reformat js2-mode go-guru go-mode clj-refactor volatile-highlights goto-chg powerline smartparens request projectile spinner hydra bind-map popup anzu highlight f s dash evil async avy toc-org macrostep evil-ediff elisp-slime-nav dumb-jump auto-compile packed zenburn-theme youdao-dictionary yaml-mode ws-butler window-numbering which-key web-mode web-beautify vi-tilde-fringe uuidgen utop use-package tuareg tagedit stickyfunc-enhance srefactor spacemacs-theme spaceline smex smeargle slim-mode scss-mode sass-mode rvm ruby-tools ruby-test-mode rubocop rspec-mode robe restart-emacs rbenv rainbow-mode rainbow-identifiers rainbow-delimiters quelpa pug-mode projectile-rails popwin persp-mode pcre2el paradox pangu-spacing orgit org-plus-contrib org-bullets open-junk-file ocp-indent neotree move-text mmm-mode minitest merlin markdown-toc magit-gitflow magit-gh-pulls lorem-ipsum linum-relative link-hint less-css-mode json-mode js2-refactor js-doc info+ indent-guide ido-vertical-mode ibuffer-projectile hungry-delete hl-todo highlight-symbol highlight-parentheses highlight-numbers highlight-indentation highlight-current-line hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make helm-gitignore helm-flx helm-descbinds helm-css-scss helm-company helm-c-yasnippet helm-anything helm-ag google-translate golden-ratio go-eldoc github-clone github-browse-file gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gist gh-md flymake-ruby flycheck-pos-tip flx-ido find-by-pinyin-dired fill-column-indicator feature-mode fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-args evil-anzu eval-sexp-fu engine-mode emmet-mode disaster define-word company-web company-tern company-statistics company-go company-c-headers column-enforce-mode color-identifiers-mode coffee-mode cmake-mode clean-aindent-mode clang-format chruby chinese-pyim bundler auto-yasnippet auto-highlight-symbol aggressive-indent ag adaptive-wrap ace-window ace-pinyin ace-link ace-jump-helm-line ac-ispell))))
+    (erlang haml-mode web-completion-data lua-mode nginx-mode pytest pyenv-mode py-isort pip-requirements live-py-mode hy-mode helm-pydoc cython-mode company-anaconda anaconda-mode pythonic fuzzy dash-functional tern clojure-snippets auto-complete livid-mode skewer-mode simple-httpd json-snatcher json-reformat js2-mode go-guru go-mode clj-refactor volatile-highlights goto-chg powerline smartparens request projectile spinner hydra bind-map popup anzu highlight f s dash evil async avy toc-org macrostep evil-ediff elisp-slime-nav dumb-jump auto-compile packed zenburn-theme youdao-dictionary yaml-mode ws-butler window-numbering which-key web-mode web-beautify vi-tilde-fringe uuidgen utop use-package tuareg tagedit stickyfunc-enhance srefactor spacemacs-theme spaceline smex smeargle slim-mode scss-mode sass-mode rvm ruby-tools ruby-test-mode rubocop rspec-mode robe restart-emacs rbenv rainbow-mode rainbow-identifiers rainbow-delimiters quelpa pug-mode projectile-rails popwin persp-mode pcre2el paradox pangu-spacing orgit org-plus-contrib org-bullets open-junk-file ocp-indent neotree move-text mmm-mode minitest merlin markdown-toc magit-gitflow magit-gh-pulls lorem-ipsum linum-relative link-hint less-css-mode json-mode js2-refactor js-doc info+ indent-guide ido-vertical-mode ibuffer-projectile hungry-delete hl-todo highlight-symbol highlight-parentheses highlight-numbers highlight-indentation highlight-current-line hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make helm-gitignore helm-flx helm-descbinds helm-css-scss helm-company helm-c-yasnippet helm-anything helm-ag google-translate golden-ratio go-eldoc github-clone github-browse-file gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gist gh-md flymake-ruby flycheck-pos-tip flx-ido find-by-pinyin-dired fill-column-indicator feature-mode fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-args evil-anzu eval-sexp-fu engine-mode emmet-mode disaster define-word company-web company-tern company-statistics company-go company-c-headers column-enforce-mode color-identifiers-mode coffee-mode cmake-mode clean-aindent-mode clang-format chruby chinese-pyim bundler auto-yasnippet auto-highlight-symbol aggressive-indent ag adaptive-wrap ace-window ace-pinyin ace-link ace-jump-helm-line ac-ispell))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
