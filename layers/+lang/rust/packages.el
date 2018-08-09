@@ -92,7 +92,10 @@
     :defer t
     :init
     (progn
-      (spacemacs/add-to-hook 'rust-mode-hook '(racer-mode eldoc-mode))
+      (spacemacs/add-to-hook 'rust-mode-hook '(racer-mode
+                                               eldoc-mode
+                                               cargo-minor-mode
+                                               ))
       (spacemacs/declare-prefix-for-mode 'rust-mode "mg" "goto")
       (add-to-list 'spacemacs-jump-handlers-rust-mode 'racer-find-definition)
       (spacemacs/declare-prefix-for-mode 'rust-mode "mh" "help")
