@@ -31,23 +31,13 @@ values."
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
    '(
-     php
-     erlang
-     html
-     lua
-     nginx
-     javascript
-     go
-     clojure
      ;; ----------------------------------------------------------------
      ;; Example of useful layers you may want to use right away.
      ;; Uncomment some layer names and press <SPC f e R> (Vim style) or
      ;; <M-m f e R> (Emacs style) to install them.
      ;; ----------------------------------------------------------------
-     helm
-     ;; auto-completion
-     ;; better-defaults
-     emacs-lisp
+     ivy
+     rust
      ;; git
      ;; markdown
      ;; org
@@ -57,42 +47,30 @@ values."
      ;; spell-checking
      ;; syntax-checking
      ;; version-control
-     git
-     auto-completion
-     ocaml
-     semantic
-     syntax-checking
-     search-engine
-     markdown
-     yaml
-     ruby-on-rails
-     c-c++
-     flycheck
-     rust
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
    ;; packages, then consider creating a layer. You can also put the
    ;; configuration in `dotspacemacs/user-config'.
    dotspacemacs-additional-packages '(bind-map
-                                      smex
-                                      ibuffer
-                                      ido
-                                      highlight-current-line
-                                      zenburn-theme ag yaml-mode
-                                      flymake-ruby
-                                      tuareg
-                                      quickrun
-                                      merlin
-                                      helm-anything
-                                      slim-mode
-                                      coffee-mode
-                                      nginx-mode lua-mode
-                                      cargo
-                                      flycheck-rust
-                                      racer
-                                      highlight-symbol
-                                      )
+                                       smex
+                                       ibuffer
+                                       company
+                                       ido
+                                       ;;highlight-current-line
+                                       zenburn-theme ag yaml-mode
+                                       flymake-ruby
+                                       tuareg
+                                       quickrun
+                                       merlin
+                                       slim-mode
+                                       coffee-mode
+                                       nginx-mode lua-mode
+                                       cargo
+                                       flycheck-rust
+                                       racer
+                                       highlight-symbol
+                                       )
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
    ;; A list of packages that will not be installed and loaded.
@@ -139,7 +117,7 @@ values."
    ;; with `:variables' keyword (similar to layers). Check the editing styles
    ;; section of the documentation for details on available variables.
    ;; (default 'vim)
-   dotspacemacs-editing-style 'hybrid
+   dotspacemacs-editing-style 'emacs
    ;; If non nil output loading progress in `*Messages*' buffer. (default nil)
    dotspacemacs-verbose-loading nil
    ;; Specify the startup banner. Default value is `official', it displays
@@ -164,8 +142,8 @@ values."
    ;; List of themes, the first of the list is loaded when spacemacs starts.
    ;; Press <SPC> T n to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
-   ;;dotspacemacs-themes '(spacemacs-dark
-   ;; spacemacs-light)
+   dotspacemacs-themes '(spacemacs-dark
+                         spacemacs-light)
    ;; If non nil the cursor color matches the state color in GUI Emacs.
    dotspacemacs-colorize-cursor-according-to-state t
    ;; Default font, or prioritized list of fonts. `powerline-scale' allows to
@@ -184,8 +162,8 @@ values."
    dotspacemacs-ex-command-key ":"
    ;; The leader key accessible in `emacs state' and `insert state'
    ;; (default "M-m")
-   dotspacemacs-emacs-leader-key "C-j"
-      ;; Major mode leader key is a shortcut key which is the equivalent of
+   dotspacemacs-emacs-leader-key "M-m"
+   ;; Major mode leader key is a shortcut key which is the equivalent of
    ;; pressing `<leader> m`. Set it to `nil` to disable it. (default ",")
    dotspacemacs-major-mode-leader-key ","
    ;; Major mode leader key accessible in `emacs state' and `insert state'.
@@ -206,8 +184,6 @@ values."
    ;; If non-nil, J and K move lines up and down when in visual mode.
    ;; (default nil)
    dotspacemacs-visual-line-move-text nil
-   dotspacemacs-elpa-https nil
-
    ;; If non nil, inverse the meaning of `g' in `:substitute' Evil ex-command.
    ;; (default nil)
    dotspacemacs-ex-substitute-global nil
@@ -351,8 +327,6 @@ explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
 
   (setq powerline-default-separator nil)
-  (golden-ratio-mode 1)
-  (global-evil-search-highlight-persist -1)
   (ido-vertical-mode -1)
 
   (require 'ido)
@@ -360,15 +334,15 @@ you should place your code here."
   (setq ido-enable-flex-matching t)
   (global-set-key (kbd "C-x b") 'ido-switch-buffer)
 
-  (require 'anything-complete)
-  (global-set-key (kbd "C-x C-f") 'ido-find-file)
-  (global-set-key (kbd "C-x f") 'ido-find-file)
-  (global-set-key (kbd "C-<return>") 'other-window)
+  ;;(require 'anything-complete)
+  ;;(global-set-key (kbd "C-x C-f") 'ido-find-file)
+  ;;(global-set-key (kbd "C-x f") 'ido-find-file)
+  ;;(global-set-key (kbd "C-<return>") 'other-window)
 
-  (require 'highlight-symbol)
+  ;;(require 'highlight-symbol)
 
-  (setq highlight-symbol-idle-delay 0.3)
-  (highlight-symbol-mode)
+  ;;(setq highlight-symbol-idle-delay 0.3)
+  ;;(highlight-symbol-mode)
 
   (defun highlight-symbol-mode-on ()
     "Turn on function `highlight-symbol-mode'."
@@ -454,14 +428,7 @@ you should place your code here."
   (require 'ibuffer)
   (global-set-key (kbd "C-x C-b") 'ibuffer)
 
-  (require 'highlight-current-line)
-  (highlight-current-line)
-  (highlight-current-line-on t)
-  ;; To customize the background color
-  (set-face-background 'highlight-current-line-face "gray29")
-
   (setq-default cursor-type '(hbar . 3))
-
   (setq default-frame-alist
         '((cursor-color . "SteelBlue1")))
 
@@ -488,36 +455,26 @@ you should place your code here."
   (autoload 'utop-minor-mode "utop" "Minor mode for utop" t)
   (add-hook 'tuareg-mode-hook 'utop-minor-mode)
 
-  (setq opam-share (substring (shell-command-to-string "opam config var share 2> /dev/null") 0 -1))
+  ;;(setq opam-share (substring (shell-command-to-string "opam config var share 2> /dev/null") 0 -1))
   ;; Start merlin on ocaml files
   (add-hook 'tuareg-mode-hook 'merlin-mode t)
   (add-hook 'caml-mode-hook 'merlin-mode t)
   (add-to-list 'load-path "~/.opam/4.02.1/share/emacs/site-lisp")
-  (require 'ocp-indent)
-  (add-hook 'after-save-hook
-            (lambda () (interactive)
-              (let ((name (file-name-extension (buffer-file-name))))
-                (if (or (string-equal name "ml") (string-equal name "mli"))
-                    (shell-command-to-string "cd ~/Users/kang/code/rubytt/src; make"))))
-            )
+
+  ;; (require 'ocp-indent)
+  ;; (add-hook 'after-save-hook
+  ;;           (lambda () (interactive)
+  ;;             (let ((name (file-name-extension (buffer-file-name))))
+  ;;               (if (or (string-equal name "ml") (string-equal name "mli"))
+  ;;                   (shell-command-to-string "cd ~/Users/kang/code/rubytt/src; make"))))
+  ;;           )
 
   ;; Enable auto-complete
   ;; (setq merlin-use-auto-complete-mode 'easy)
   ;; Use opam switch to lookup ocamlmerlin binary
   (setq merlin-command 'opam)
 
-  ;; (add-hook 'dired-mode-hook
-  ;;           (lambda ()
-  ;;             ;;(define-key dired-mode-map (kbd "<return>")
-  ;;             ;;'dired-find-alternate-file) ; was dired-advertised-find-file
-  ;;             (define-key dired-mode-map (kbd "^")
-  ;;               (lambda () (interactive) (find-alternate-file "..")))
-  ;;             (define-key dired-mode-map (kbd "r")
-  ;;               (lambda () (interactive) (find-alternate-file "..")))
-  ;;             ))
-
   (global-set-key (kbd "C-;") 'helm-projectile)
-  (search-engine/init-engine-mode)
 
   (set-fringe-mode '(0 . 0))
   (blink-cursor-mode)
@@ -525,17 +482,17 @@ you should place your code here."
   (setq ruby-insert-encoding-magic-comment nil)
 
   (require 'company)
-  (global-company-mode)()
+  (global-company-mode)
   (add-hook 'cider-repl-mode-hook #'company-mode)
   (add-hook 'cider-mode-hook #'company-mode)
   (add-hook 'cider-repl-mode-hook #'cider-company-enable-fuzzy-completion)
   (add-hook 'cider-mode-hook #'cider-company-enable-fuzzy-completion)
   (setq cider-annotate-completion-function t)
 
-  (add-to-list 'load-path "~/.emacs.d/packages/yasnippet")
-  (require 'yasnippet)
-  (setq yas-snippet-dirs '("~/.emacs.d/snippets"))
-  (yas-global-mode 1)
+  ;;(add-to-list 'load-path "~/.emacs.d/packages/yasnippet")
+  ;; (require 'yasnippet)
+  ;; (setq yas-snippet-dirs '("~/.emacs.d/snippets"))
+  ;; (yas-global-mode 1)
 
   (eval-after-load 'company
     '(progn
@@ -598,16 +555,28 @@ you should place your code here."
   (global-set-key (kbd "TAB") 'indent-for-tab-command)
 
 
-  ;; (add-hook 'rust-mode-hook  #'racer-mode)
-  ;; (with-eval-after-load 'rust-mode
-  ;;   (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
-  ;; (add-hook 'rust-mode-hook 'cargo-minor-mode)
-  ;; (add-hook 'rust-mode-hook
-  ;;           (lambda ()
-  ;;             (local-set-key (kbd "C-c <tab>") #'rust-format-buffer)))
-  ;; (add-hook 'rust-mode-hook #'rustfmt-enable-on-save)
-  (add-hook 'rust-mode-hook #'rust-enable-format-on-save)
+  (add-hook 'rust-mode-hook  #'racer-mode)
+  (with-eval-after-load 'rust-mode
+    (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
+  (add-hook 'rust-mode-hook 'cargo-minor-mode)
+  (add-hook 'rust-mode-hook
+            (lambda ()
+              (local-set-key (kbd "C-c <tab>") #'rust-format-buffer)))
+  ;;(add-hook 'rust-mode-hook #'rustfmt-enable-on-save)
+  ;;(add-hook 'rust-mode-hook #'rust-enable-format-on-save)
 
+
+  (defun rust-save-compile-and-run ()
+    (interactive)
+    (save-buffer)
+    (if (locate-dominating-file (buffer-file-name) "Cargo.toml")
+        (compile "cargo build")
+      (compile
+       (format "rustc %s && %s"
+               (buffer-file-name)
+               (file-name-sans-extension (buffer-file-name))))))
+
+  (defalias 'rr 'rust-save-compile-and-run)
   )
 
 ;; Do not write anything past this comment. This is where Emacs will
@@ -617,43 +586,9 @@ you should place your code here."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(ahs-case-fold-search nil)
- '(ahs-default-range (quote ahs-range-whole-buffer))
- '(ahs-idle-interval 0.25)
- '(ahs-idle-timer 0 t)
- '(ahs-inhibit-face-list nil)
- '(company-auto-complete-chars (quote (32 41 46 34 47 124 33)))
- '(company-completion-started-hook (quote (ignore)))
- '(company-idle-delay 0.2)
- '(company-minimum-prefix-length 1)
- '(company-occurrence-weight-function (quote company-occurrence-prefer-any-closest))
- '(company-show-numbers nil)
- '(company-transformers (quote (company-sort-by-occurrence)))
- '(compilation-message-face (quote default))
- '(cua-global-mark-cursor-color "#2aa198")
- '(cua-normal-cursor-color "#657b83")
- '(cua-overwrite-cursor-color "#b58900")
- '(cua-read-only-cursor-color "#859900")
- '(custom-enabled-themes (quote (zenburn)))
- '(custom-safe-themes
-   (quote
-    ("f5512c02e0a6887e987a816918b7a684d558716262ac7ee2dd0437ab913eaec6" "3f630e9f343200ce27cfeb44f01c9046a4b2687a4751ba2b30e503da307cd27b" "99fce0c01e01cb934f373a3e8c3224f80be568c6d9a548975a5cb0a0910f0a60" "19352d62ea0395879be564fc36bc0b4780d9768a964d26dfae8aad218062858d" default)))
- '(evil-want-Y-yank-to-eol nil)
- '(highlight-changes-colors (quote ("#d33682" "#6c71c4")))
- '(highlight-symbol-foreground-color "light green")
- '(highlight-tail-colors
-   (quote
-    (("#eee8d5" . 0)
-     ("#B4C342" . 20)
-     ("#69CABF" . 30)
-     ("#69B7F0" . 50)
-     ("#DEB542" . 60)
-     ("#F2804F" . 70)
-     ("#F771AC" . 85)
-     ("#eee8d5" . 100))))
  '(package-selected-packages
    (quote
-    (phpunit phpcbf php-extras php-auto-yasnippets drupal-mode php-mode winum caml quickrun rake parent-mode gitignore-mode flymake-easy pos-tip flycheck flx magit magit-popup git-commit ghub with-editor iedit diminish company inflections edn multiple-cursors paredit peg cider-eval-sexp-fu cider sesman queue pkg-info clojure-mode epl markdown-mode inf-ruby bind-key helm helm-core cargo toml-mode racer flycheck-rust rust-mode yasnippet erlang haml-mode web-completion-data lua-mode nginx-mode pytest pyenv-mode py-isort pip-requirements live-py-mode hy-mode helm-pydoc cython-mode company-anaconda anaconda-mode pythonic fuzzy dash-functional tern clojure-snippets auto-complete livid-mode skewer-mode simple-httpd json-snatcher json-reformat js2-mode go-guru go-mode clj-refactor volatile-highlights goto-chg powerline smartparens request projectile spinner hydra bind-map popup anzu highlight f s dash evil async avy toc-org macrostep evil-ediff elisp-slime-nav dumb-jump auto-compile packed zenburn-theme youdao-dictionary yaml-mode ws-butler window-numbering which-key web-mode web-beautify vi-tilde-fringe uuidgen utop use-package tuareg tagedit stickyfunc-enhance srefactor spacemacs-theme spaceline smex smeargle slim-mode scss-mode sass-mode rvm ruby-tools ruby-test-mode rubocop rspec-mode robe restart-emacs rbenv rainbow-mode rainbow-identifiers rainbow-delimiters quelpa pug-mode projectile-rails popwin persp-mode pcre2el paradox pangu-spacing orgit org-plus-contrib org-bullets open-junk-file ocp-indent neotree move-text mmm-mode minitest merlin markdown-toc magit-gitflow magit-gh-pulls lorem-ipsum linum-relative link-hint less-css-mode json-mode js2-refactor js-doc info+ indent-guide ido-vertical-mode ibuffer-projectile hungry-delete hl-todo highlight-symbol highlight-parentheses highlight-numbers highlight-indentation highlight-current-line hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make helm-gitignore helm-flx helm-descbinds helm-css-scss helm-company helm-c-yasnippet helm-anything helm-ag google-translate golden-ratio go-eldoc github-clone github-browse-file gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gist gh-md flymake-ruby flycheck-pos-tip flx-ido find-by-pinyin-dired fill-column-indicator feature-mode fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-args evil-anzu eval-sexp-fu engine-mode emmet-mode disaster define-word company-web company-tern company-statistics company-go company-c-headers column-enforce-mode color-identifiers-mode coffee-mode cmake-mode clean-aindent-mode clang-format chruby chinese-pyim bundler auto-yasnippet auto-highlight-symbol aggressive-indent ag adaptive-wrap ace-window ace-pinyin ace-link ace-jump-helm-line ac-ispell))))
+    (zenburn-theme yaml-mode web-mode web-beautify utop tuareg caml toml-mode tagedit stickyfunc-enhance srefactor smeargle slim-mode scss-mode sass-mode rvm ruby-tools ruby-test-mode rubocop rspec-mode robe rbenv racer quickrun pug-mode projectile-rails rake phpunit phpcbf php-extras php-auto-yasnippets orgit ocp-indent nginx-mode mmm-mode minitest merlin markdown-toc magit-gitflow magit-popup lua-mode livid-mode skewer-mode simple-httpd less-css-mode json-mode json-snatcher json-reformat js2-refactor js2-mode js-doc highlight-symbol haml-mode go-guru go-eldoc gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md fuzzy flymake-ruby flymake-easy flycheck-rust flycheck-pos-tip pos-tip flycheck feature-mode evil-magit magit transient git-commit with-editor erlang engine-mode emmet-mode drupal-mode php-mode disaster company-web web-completion-data company-tern dash-functional tern company-statistics company-go go-mode company-c-headers company coffee-mode cmake-mode clojure-snippets clj-refactor inflections edn multiple-cursors paredit peg clang-format cider-eval-sexp-fu cider sesman queue parseedn clojure-mode parseclj a chruby cargo markdown-mode rust-mode bundler inf-ruby auto-yasnippet yasnippet ag ac-ispell auto-complete wgrep smex ivy-hydra lv counsel-projectile counsel swiper ivy ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu elisp-slime-nav dumb-jump diminish define-word column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
