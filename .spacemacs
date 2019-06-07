@@ -31,6 +31,7 @@ values."
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
    '(
+     php
      erlang
      html
      lua
@@ -597,13 +598,6 @@ you should place your code here."
   (global-set-key (kbd "TAB") 'indent-for-tab-command)
 
 
-  ;; (add-to-list 'load-path "~/.emacs.d/packages/cargo.el/")
-  ;; (require 'racer)
-  ;; (require 'rust-mode)
-  ;; (require 'flycheck-rust)
-
-  ;; (add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-mode))
-  ;; (add-hook 'rust-mode-hook  #'company-mode)
   ;; (add-hook 'rust-mode-hook  #'racer-mode)
   ;; (with-eval-after-load 'rust-mode
   ;;   (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
@@ -612,6 +606,7 @@ you should place your code here."
   ;;           (lambda ()
   ;;             (local-set-key (kbd "C-c <tab>") #'rust-format-buffer)))
   ;; (add-hook 'rust-mode-hook #'rustfmt-enable-on-save)
+  (add-hook 'rust-mode-hook #'rust-enable-format-on-save)
 
   )
 
@@ -622,11 +617,11 @@ you should place your code here."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(ahs-case-fold-search nil t)
- '(ahs-default-range (quote ahs-range-whole-buffer) t)
- '(ahs-idle-interval 0.25 t)
+ '(ahs-case-fold-search nil)
+ '(ahs-default-range (quote ahs-range-whole-buffer))
+ '(ahs-idle-interval 0.25)
  '(ahs-idle-timer 0 t)
- '(ahs-inhibit-face-list nil t)
+ '(ahs-inhibit-face-list nil)
  '(company-auto-complete-chars (quote (32 41 46 34 47 124 33)))
  '(company-completion-started-hook (quote (ignore)))
  '(company-idle-delay 0.2)
@@ -658,7 +653,7 @@ you should place your code here."
      ("#eee8d5" . 100))))
  '(package-selected-packages
    (quote
-    (winum caml quickrun rake parent-mode gitignore-mode flymake-easy pos-tip flycheck flx magit magit-popup git-commit ghub with-editor iedit diminish company inflections edn multiple-cursors paredit peg cider-eval-sexp-fu cider sesman queue pkg-info clojure-mode epl markdown-mode inf-ruby bind-key helm helm-core cargo toml-mode racer flycheck-rust rust-mode yasnippet erlang haml-mode web-completion-data lua-mode nginx-mode pytest pyenv-mode py-isort pip-requirements live-py-mode hy-mode helm-pydoc cython-mode company-anaconda anaconda-mode pythonic fuzzy dash-functional tern clojure-snippets auto-complete livid-mode skewer-mode simple-httpd json-snatcher json-reformat js2-mode go-guru go-mode clj-refactor volatile-highlights goto-chg powerline smartparens request projectile spinner hydra bind-map popup anzu highlight f s dash evil async avy toc-org macrostep evil-ediff elisp-slime-nav dumb-jump auto-compile packed zenburn-theme youdao-dictionary yaml-mode ws-butler window-numbering which-key web-mode web-beautify vi-tilde-fringe uuidgen utop use-package tuareg tagedit stickyfunc-enhance srefactor spacemacs-theme spaceline smex smeargle slim-mode scss-mode sass-mode rvm ruby-tools ruby-test-mode rubocop rspec-mode robe restart-emacs rbenv rainbow-mode rainbow-identifiers rainbow-delimiters quelpa pug-mode projectile-rails popwin persp-mode pcre2el paradox pangu-spacing orgit org-plus-contrib org-bullets open-junk-file ocp-indent neotree move-text mmm-mode minitest merlin markdown-toc magit-gitflow magit-gh-pulls lorem-ipsum linum-relative link-hint less-css-mode json-mode js2-refactor js-doc info+ indent-guide ido-vertical-mode ibuffer-projectile hungry-delete hl-todo highlight-symbol highlight-parentheses highlight-numbers highlight-indentation highlight-current-line hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make helm-gitignore helm-flx helm-descbinds helm-css-scss helm-company helm-c-yasnippet helm-anything helm-ag google-translate golden-ratio go-eldoc github-clone github-browse-file gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gist gh-md flymake-ruby flycheck-pos-tip flx-ido find-by-pinyin-dired fill-column-indicator feature-mode fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-args evil-anzu eval-sexp-fu engine-mode emmet-mode disaster define-word company-web company-tern company-statistics company-go company-c-headers column-enforce-mode color-identifiers-mode coffee-mode cmake-mode clean-aindent-mode clang-format chruby chinese-pyim bundler auto-yasnippet auto-highlight-symbol aggressive-indent ag adaptive-wrap ace-window ace-pinyin ace-link ace-jump-helm-line ac-ispell))))
+    (phpunit phpcbf php-extras php-auto-yasnippets drupal-mode php-mode winum caml quickrun rake parent-mode gitignore-mode flymake-easy pos-tip flycheck flx magit magit-popup git-commit ghub with-editor iedit diminish company inflections edn multiple-cursors paredit peg cider-eval-sexp-fu cider sesman queue pkg-info clojure-mode epl markdown-mode inf-ruby bind-key helm helm-core cargo toml-mode racer flycheck-rust rust-mode yasnippet erlang haml-mode web-completion-data lua-mode nginx-mode pytest pyenv-mode py-isort pip-requirements live-py-mode hy-mode helm-pydoc cython-mode company-anaconda anaconda-mode pythonic fuzzy dash-functional tern clojure-snippets auto-complete livid-mode skewer-mode simple-httpd json-snatcher json-reformat js2-mode go-guru go-mode clj-refactor volatile-highlights goto-chg powerline smartparens request projectile spinner hydra bind-map popup anzu highlight f s dash evil async avy toc-org macrostep evil-ediff elisp-slime-nav dumb-jump auto-compile packed zenburn-theme youdao-dictionary yaml-mode ws-butler window-numbering which-key web-mode web-beautify vi-tilde-fringe uuidgen utop use-package tuareg tagedit stickyfunc-enhance srefactor spacemacs-theme spaceline smex smeargle slim-mode scss-mode sass-mode rvm ruby-tools ruby-test-mode rubocop rspec-mode robe restart-emacs rbenv rainbow-mode rainbow-identifiers rainbow-delimiters quelpa pug-mode projectile-rails popwin persp-mode pcre2el paradox pangu-spacing orgit org-plus-contrib org-bullets open-junk-file ocp-indent neotree move-text mmm-mode minitest merlin markdown-toc magit-gitflow magit-gh-pulls lorem-ipsum linum-relative link-hint less-css-mode json-mode js2-refactor js-doc info+ indent-guide ido-vertical-mode ibuffer-projectile hungry-delete hl-todo highlight-symbol highlight-parentheses highlight-numbers highlight-indentation highlight-current-line hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make helm-gitignore helm-flx helm-descbinds helm-css-scss helm-company helm-c-yasnippet helm-anything helm-ag google-translate golden-ratio go-eldoc github-clone github-browse-file gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gist gh-md flymake-ruby flycheck-pos-tip flx-ido find-by-pinyin-dired fill-column-indicator feature-mode fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-args evil-anzu eval-sexp-fu engine-mode emmet-mode disaster define-word company-web company-tern company-statistics company-go company-c-headers column-enforce-mode color-identifiers-mode coffee-mode cmake-mode clean-aindent-mode clang-format chruby chinese-pyim bundler auto-yasnippet auto-highlight-symbol aggressive-indent ag adaptive-wrap ace-window ace-pinyin ace-link ace-jump-helm-line ac-ispell))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
