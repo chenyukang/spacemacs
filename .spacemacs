@@ -37,6 +37,7 @@ values."
      ;; <M-m f e R> (Emacs style) to install them.
      ;; ----------------------------------------------------------------
      ivy
+     helm
      rust
      ;; git
      ;; markdown
@@ -70,6 +71,8 @@ values."
                                        flycheck-rust
                                        racer
                                        highlight-symbol
+                                       avy
+                                       magit
                                        )
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
@@ -117,7 +120,7 @@ values."
    ;; with `:variables' keyword (similar to layers). Check the editing styles
    ;; section of the documentation for details on available variables.
    ;; (default 'vim)
-   dotspacemacs-editing-style 'emacs
+   dotspacemacs-editing-style 'hybrid
    ;; If non nil output loading progress in `*Messages*' buffer. (default nil)
    dotspacemacs-verbose-loading nil
    ;; Specify the startup banner. Default value is `official', it displays
@@ -335,8 +338,8 @@ you should place your code here."
   (global-set-key (kbd "C-x b") 'ido-switch-buffer)
 
   ;;(require 'anything-complete)
-  ;;(global-set-key (kbd "C-x C-f") 'ido-find-file)
-  ;;(global-set-key (kbd "C-x f") 'ido-find-file)
+  (global-set-key (kbd "C-x C-f") 'ido-find-file)
+  (global-set-key (kbd "C-x f") 'ido-find-file)
   ;;(global-set-key (kbd "C-<return>") 'other-window)
 
   ;;(require 'highlight-symbol)
@@ -359,11 +362,14 @@ you should place your code here."
   (global-set-key (kbd "C-l") 'smex)
   (global-set-key (kbd "C-=") 'dabbrev-expand)
 
+  (global-set-key (kbd "<C-return>") 'other-window)
+
   (defalias 'idw 'ido-select-window)
   (defalias 'qrr 'query-replace)
   (defalias 'hi 'helm-imenu)
   (defalias 'hf 'helm-projectile)
   (defalias 'hr 'helm-recentf)
+  (defalias 'c 'avy-goto-char-2)
   (defalias 'h 'helm-mini)
   (defalias 'cp 'copy-region-as-kill)
   (defalias 'bk 'helm-bookmarks)
@@ -376,24 +382,22 @@ you should place your code here."
   (defalias 'gf 'grep-find)
   (defalias 'pg 'projectile-ag)
   (defalias 'fd 'find-dired)
-  (defalias 'e 'eshell)
+  (defalias 'es 'eshell)
   (defalias 'f 'projectile-find-file)
   (defalias 'r 'recentf-open-files)
   (defalias 'ha 'helm-ag)
   (defalias 'hat 'helm-ag-this-file)
-  (defalias 'i 'iy-go-to-char)
   (defalias 'ib 'iy-go-to-char-backward)
   (defalias 'w 'windmove-up)
   (defalias 's 'windmove-down)
   (defalias 'd 'windmove-right)
   (defalias 'a 'windmove-left)
-  (defalias 'ep 'er/expand-region)
-  (defalias 'mh 'my-helm-multi-all)
-  (defalias 'f 'helm-buffers-list)
   (defalias 'g 'god-mode-all)
   (defalias 'wc 'whitespace-cleanup)
   (defalias 'hs 'helm-swoop)
   (defalias 'ms 'magit-status)
+
+  (require 'magit)
 
   (defun get-continue-string ()
     (interactive)
@@ -577,6 +581,10 @@ you should place your code here."
                (file-name-sans-extension (buffer-file-name))))))
 
   (defalias 'rr 'rust-save-compile-and-run)
+
+  ;; (with-eval-after-load 'helm
+  ;;   (setq helm-display-function 'helm-default-display-buffer))
+
   )
 
 ;; Do not write anything past this comment. This is where Emacs will
