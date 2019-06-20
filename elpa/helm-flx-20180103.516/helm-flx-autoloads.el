@@ -1,7 +1,10 @@
 ;;; helm-flx-autoloads.el --- automatically extracted autoloads
 ;;
 ;;; Code:
-(add-to-list 'load-path (directory-file-name (or (file-name-directory #$) (car load-path))))
+
+(add-to-list 'load-path (directory-file-name
+                         (or (file-name-directory #$) (car load-path))))
+
 
 ;;;### (autoloads nil "helm-flx" "helm-flx.el" (0 0 0 0))
 ;;; Generated autoloads from helm-flx.el
@@ -29,5 +32,6 @@ helm-flx minor mode
 ;; version-control: never
 ;; no-byte-compile: t
 ;; no-update-autoloads: t
+;; coding: utf-8
 ;; End:
 ;;; helm-flx-autoloads.el ends here

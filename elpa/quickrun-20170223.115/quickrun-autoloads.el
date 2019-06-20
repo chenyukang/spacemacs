@@ -1,10 +1,12 @@
 ;;; quickrun-autoloads.el --- automatically extracted autoloads
 ;;
 ;;; Code:
-(add-to-list 'load-path (directory-file-name (or (file-name-directory #$) (car load-path))))
+
+(add-to-list 'load-path (directory-file-name
+                         (or (file-name-directory #$) (car load-path))))
+
 
-;;;### (autoloads nil "quickrun" "quickrun.el" (23802 17228 798948
-;;;;;;  865000))
+;;;### (autoloads nil "quickrun" "quickrun.el" (0 0 0 0))
 ;;; Generated autoloads from quickrun.el
 
 (autoload 'quickrun-set-default "quickrun" "\
@@ -71,11 +73,14 @@ Run commands in shell for interactive programs
 
 \(fn)" t nil)
 
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "quickrun" '("quick" "helm-quickrun-")))
+
 ;;;***
 
 ;; Local Variables:
 ;; version-control: never
 ;; no-byte-compile: t
 ;; no-update-autoloads: t
+;; coding: utf-8
 ;; End:
 ;;; quickrun-autoloads.el ends here

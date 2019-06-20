@@ -1,10 +1,15 @@
 ;;; flymake-easy-autoloads.el --- automatically extracted autoloads
 ;;
 ;;; Code:
-(add-to-list 'load-path (directory-file-name (or (file-name-directory #$) (car load-path))))
+
+(add-to-list 'load-path (directory-file-name
+                         (or (file-name-directory #$) (car load-path))))
+
 
-;;;### (autoloads nil nil ("flymake-easy.el") (23802 17161 890950
-;;;;;;  629000))
+;;;### (autoloads nil "flymake-easy" "flymake-easy.el" (0 0 0 0))
+;;; Generated autoloads from flymake-easy.el
+
+(if (fboundp 'register-definition-prefixes) (register-definition-prefixes "flymake-easy" '("flymake-easy-")))
 
 ;;;***
 
@@ -12,5 +17,6 @@
 ;; version-control: never
 ;; no-byte-compile: t
 ;; no-update-autoloads: t
+;; coding: utf-8
 ;; End:
 ;;; flymake-easy-autoloads.el ends here

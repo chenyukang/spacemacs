@@ -1,7 +1,10 @@
 ;;; helm-descbinds-autoloads.el --- automatically extracted autoloads
 ;;
 ;;; Code:
-(add-to-list 'load-path (directory-file-name (or (file-name-directory #$) (car load-path))))
+
+(add-to-list 'load-path (directory-file-name
+                         (or (file-name-directory #$) (car load-path))))
+
 
 ;;;### (autoloads nil "helm-descbinds" "helm-descbinds.el" (0 0 0
 ;;;;;;  0))
@@ -63,5 +66,6 @@ useful, yet they are listed for completeness.
 ;; version-control: never
 ;; no-byte-compile: t
 ;; no-update-autoloads: t
+;; coding: utf-8
 ;; End:
 ;;; helm-descbinds-autoloads.el ends here
