@@ -51,7 +51,7 @@ private/
 !private/snippets/README.md
 !private/local/README.md
 /games/
-
+/elpa/
 
 ido.last
 elpa/gnupg/
