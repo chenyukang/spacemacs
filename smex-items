@@ -1,0 +1,34 @@
+
+;; ----- smex-history -----
+(
+ rt
+ rr
+ cm
+ cp
+ kr
+ ms
+ uc
+)
+
+;; ----- smex-data -----
+(
+ (c . 3)
+ (helm-swoop . 1)
+ (hs . 5)
+ (rust-test . 11)
+ (spacemacs/ivy-persp-switch-project . 1)
+ (hf . 1)
+ (os . 3)
+ (rr . 104)
+ (cargo-process-test . 1)
+ (rt . 23)
+ (cm . 7)
+ (pg . 1)
+ (cp . 8)
+ (company-previous-page . 1)
+ (kr . 5)
+ (search-forward . 13)
+ (query-replace . 1)
+ (uc . 1)
+ (ms . 1)
+)
