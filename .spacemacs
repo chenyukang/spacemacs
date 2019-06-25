@@ -31,22 +31,26 @@ values."
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
    '(
+     graphviz
+     javascript
+     html
      ;; ----------------------------------------------------------------
      ;; Example of useful layers you may want to use right away.
      ;; Uncomment some layer names and press <SPC f e R> (Vim style) or
      ;; <M-m f e R> (Emacs style) to install them.
      ;; ----------------------------------------------------------------
-     helm
      ivy
      rust
      ruby
-     ;; git
-     ;; markdown
-     ;; org
-     ;; (shell :variables
-     ;;        shell-default-height 30
-     ;;        shell-default-position 'bottom)
-     ;; spell-checking
+     shell-scripts
+     lua
+     ocaml
+     python
+     c-c++
+     osx
+     git
+     ;;markdown
+     ;;spell-checking
      syntax-checking
      version-control
      )
@@ -59,12 +63,13 @@ values."
                                        ibuffer
                                        company
                                        ido
-                                       ;;highlight-current-line
                                        zenburn-theme ag yaml-mode
                                        flymake-ruby
                                        tuareg
                                        quickrun
                                        merlin
+                                       helm
+                                       helm-projectile
                                        slim-mode
                                        coffee-mode
                                        nginx-mode lua-mode
@@ -72,8 +77,6 @@ values."
                                        flycheck-rust
                                        racer
                                        highlight-symbol
-                                       avy
-                                       magit
                                        )
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
@@ -152,11 +155,11 @@ values."
    dotspacemacs-colorize-cursor-according-to-state t
    ;; Default font, or prioritized list of fonts. `powerline-scale' allows to
    ;; quickly tweak the mode-line size to make separators look not too crappy.
-   dotspacemacs-default-font '("Source Code Pro"
-                               :size 13
-                               :weight normal
-                               :width normal
-                               :powerline-scale 1.1)
+   ;; dotspacemacs-default-font '("Source Code Pro"
+   ;;                             :size 13
+   ;;                             :weight normal
+   ;;                             :width normal
+   ;;                             :powerline-scale 1.1)
    ;; The leader key
    dotspacemacs-leader-key "SPC"
    ;; The key used for Emacs commands (M-x) (after pressing on the leader key).
@@ -214,7 +217,7 @@ values."
    dotspacemacs-helm-resize 1
    ;; if non nil, the helm header is hidden when there is only one source.
    ;; (default nil)
-   dotspacemacs-helm-no-header nil
+   dotspacemacs-helm-no-header 1
    ;; define the position to display `helm', options are `bottom', `top',
    ;; `left', or `right'. (default 'bottom)
    dotspacemacs-helm-position 'bottom
@@ -320,8 +323,6 @@ executes.
  This function is mostly useful for variables that need to be set
 before packages are loaded. If you are unsure, you should try in setting them in
 `dotspacemacs/user-config' first."
-  (push '("melpa-stable" . "stable.melpa.org/packages/") configuration-layer--elpa-archives)
-  (push '(helm . "melpa-stable") package-pinned-packages)
   )
 
 (defun dotspacemacs/user-config ()
@@ -332,26 +333,24 @@ This is the place where most of your configurations should be done. Unless it is
 explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
 
-  (require 'helm-bookmark)
   (setq powerline-default-separator nil)
   (ido-vertical-mode -1)
 
-  (require 'ido)
-  (require 'ivy)
+  (require 'helm)
+  (require 'helm-projectile)
 
+  (require 'ido)
   (ido-mode t)
   (setq ido-enable-flex-matching t)
   (global-set-key (kbd "C-x b") 'ido-switch-buffer)
 
   ;;(require 'anything-complete)
-  (global-set-key (kbd "C-x C-f") 'ido-find-file)
-  (global-set-key (kbd "C-x f") 'ido-find-file)
+  ;;(global-set-key (kbd "C-x C-f") 'ido-find-file)
+  ;;(global-set-key (kbd "C-x f") 'ido-find-file)
   ;;(global-set-key (kbd "C-<return>") 'other-window)
 
-  ;;(require 'highlight-symbol)
-
-  ;;(setq highlight-symbol-idle-delay 0.3)
-  ;;(highlight-symbol-mode)
+  (require 'highlight-symbol)
+  (highlight-symbol-mode)
 
   (defun highlight-symbol-mode-on ()
     "Turn on function `highlight-symbol-mode'."
@@ -359,24 +358,21 @@ you should place your code here."
   (defun highlight-symbol-mode-off ()
     "Turn off function `highlight-symbol-mode'."
     (highlight-symbol-mode -1))
-
   (add-hook 'find-file-hook 'highlight-symbol-mode-on)
+  (defalias 'hn 'highlight-symbol-next)
 
   (require 'smex)
   (smex-initialize)
   (global-set-key (kbd "C-j") 'helm-projectile)
   (global-set-key (kbd "C-l") 'smex)
   (global-set-key (kbd "C-=") 'dabbrev-expand)
-  (global-set-key (kbd "C-s") 'helm-swoop)
-
-  (global-set-key (kbd "<C-return>") 'other-window)
+  (global-set-key (kbd "C-s") 'isearch-forward)
 
   (defalias 'idw 'ido-select-window)
   (defalias 'qrr 'query-replace)
   (defalias 'hi 'helm-imenu)
   (defalias 'hf 'helm-projectile)
   (defalias 'hr 'helm-recentf)
-  (defalias 'c 'avy-goto-char-2)
   (defalias 'h 'helm-mini)
   (defalias 'cp 'copy-region-as-kill)
   (defalias 'bk 'helm-bookmarks)
@@ -389,22 +385,24 @@ you should place your code here."
   (defalias 'gf 'grep-find)
   (defalias 'pg 'projectile-ag)
   (defalias 'fd 'find-dired)
-  (defalias 'es 'eshell)
+  (defalias 'e 'eshell)
   (defalias 'f 'projectile-find-file)
   (defalias 'r 'recentf-open-files)
   (defalias 'ha 'helm-ag)
   (defalias 'hat 'helm-ag-this-file)
+  (defalias 'i 'iy-go-to-char)
   (defalias 'ib 'iy-go-to-char-backward)
   (defalias 'w 'windmove-up)
   (defalias 's 'windmove-down)
   (defalias 'd 'windmove-right)
   (defalias 'a 'windmove-left)
+  (defalias 'ep 'er/expand-region)
+  (defalias 'mh 'my-helm-multi-all)
+  (defalias 'f 'helm-buffers-list)
   (defalias 'g 'god-mode-all)
   (defalias 'wc 'whitespace-cleanup)
-  (defalias 'hs 'helm-swoop)
+  (defalias 'hs 'swiper)
   (defalias 'ms 'magit-status)
-
-  (require 'magit)
 
   (defun get-continue-string ()
     (interactive)
@@ -445,9 +443,6 @@ you should place your code here."
 
   (require 'flymake-ruby)
   (add-hook 'ruby-mode-hook 'flymake-ruby-load)
-
-  ;; (add-hook 'dired-mode-hook
-  ;;           (lambda () (local-set-key (kbd "r") 'dired-up-directory)))
 
   (autoload 'inf-ruby-minor-mode "inf-ruby" "Run an inferior Ruby process" t)
   (add-hook 'ruby-mode-hook 'inf-ruby-minor-mode)
@@ -555,7 +550,6 @@ you should place your code here."
   (define-key evil-motion-state-map (kbd "C-v") 'scroll-up-command)
   (global-set-key (kbd "C-,") 'scroll-down-command)
 
-
   (defun backto-evil-normal-state()
     (interactive)
     (progn
@@ -590,9 +584,9 @@ you should place your code here."
   (defalias 'rr 'rust-save-compile-and-run)
   (defalias 'rt 'cargo-process-test)
 
-  ;; (with-eval-after-load 'helm
-  ;;   (setq helm-display-function 'helm-default-display-buffer))
 
+  (add-hook 'dired-mode-hook
+            (lambda () (local-set-key (kbd "r") 'dired-up-directory)))
   )
 
 ;; Do not write anything past this comment. This is where Emacs will
@@ -602,12 +596,16 @@ you should place your code here."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(global-hl-line-mode t)
+ '(highlight-symbol-foreground-color "keyboardFocusIndicatorColor")
+ '(highlight-symbol-idle-delay 0.5)
  '(package-selected-packages
    (quote
-    (helm helm-core git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter diff-hl zenburn-theme yaml-mode web-mode web-beautify utop tuareg caml toml-mode tagedit stickyfunc-enhance srefactor smeargle slim-mode scss-mode sass-mode rvm ruby-tools ruby-test-mode rubocop rspec-mode robe rbenv racer quickrun pug-mode projectile-rails rake phpunit phpcbf php-extras php-auto-yasnippets orgit ocp-indent nginx-mode mmm-mode minitest merlin markdown-toc magit-gitflow magit-popup lua-mode livid-mode skewer-mode simple-httpd less-css-mode json-mode json-snatcher json-reformat js2-refactor js2-mode js-doc highlight-symbol haml-mode go-guru go-eldoc gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md fuzzy flymake-ruby flymake-easy flycheck-rust flycheck-pos-tip pos-tip flycheck feature-mode evil-magit magit transient git-commit with-editor erlang engine-mode emmet-mode drupal-mode php-mode disaster company-web web-completion-data company-tern dash-functional tern company-statistics company-go go-mode company-c-headers company coffee-mode cmake-mode clojure-snippets clj-refactor inflections edn multiple-cursors paredit peg clang-format cider-eval-sexp-fu cider sesman queue parseedn clojure-mode parseclj a chruby cargo markdown-mode rust-mode bundler inf-ruby auto-yasnippet yasnippet ag ac-ispell auto-complete wgrep smex ivy-hydra lv counsel-projectile counsel swiper ivy ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu elisp-slime-nav dumb-jump diminish define-word column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line))))
+    (graphviz-dot-mode powerline hydra avy anzu iedit smartparens highlight evil goto-chg undo-tree projectile async f dash yapfify reveal-in-osx-finder pyvenv pytest pyenv-mode py-isort pip-requirements pbcopy osx-trash osx-dictionary live-py-mode launchctl insert-shebang hy-mode fish-mode cython-mode anaconda-mode pythonic helm-gitignore git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter flyspell-correct-ivy flyspell-correct-helm flyspell-correct diff-hl auto-dictionary helm helm-core zenburn-theme yaml-mode web-mode web-beautify utop tuareg caml toml-mode tagedit stickyfunc-enhance srefactor smeargle slim-mode scss-mode sass-mode rvm ruby-tools ruby-test-mode rubocop rspec-mode robe rbenv racer quickrun pug-mode projectile-rails rake phpunit phpcbf php-extras php-auto-yasnippets orgit ocp-indent nginx-mode mmm-mode minitest merlin markdown-toc magit-gitflow magit-popup lua-mode livid-mode skewer-mode simple-httpd less-css-mode json-mode json-snatcher json-reformat js2-refactor js2-mode js-doc highlight-symbol haml-mode go-guru go-eldoc gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md fuzzy flymake-ruby flymake-easy flycheck-rust flycheck-pos-tip pos-tip flycheck feature-mode evil-magit magit transient git-commit with-editor erlang engine-mode emmet-mode drupal-mode php-mode disaster company-web web-completion-data company-tern dash-functional tern company-statistics company-go go-mode company-c-headers company coffee-mode cmake-mode clojure-snippets clj-refactor inflections edn multiple-cursors paredit peg clang-format cider-eval-sexp-fu cider sesman queue parseedn clojure-mode parseclj a chruby cargo markdown-mode rust-mode bundler inf-ruby auto-yasnippet yasnippet ag ac-ispell auto-complete wgrep smex ivy-hydra lv counsel-projectile counsel swiper ivy ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu elisp-slime-nav dumb-jump diminish define-word column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(highlight-symbol-face ((t (:background "disabledControlTextColor"))))
+ '(hl-line ((t (:background "controlTextColor")))))
