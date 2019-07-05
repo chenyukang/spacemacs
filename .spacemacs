@@ -45,7 +45,6 @@ values."
      shell-scripts
      lua
      ocaml
-     python
      c-c++
      osx
      git
@@ -62,6 +61,8 @@ values."
                                        smex
                                        ibuffer
                                        company
+                                       helm
+                                       helm-swoop
                                        ido
                                        zenburn-theme ag yaml-mode
                                        flymake-ruby
@@ -338,6 +339,8 @@ you should place your code here."
   (ido-vertical-mode -1)
 
   (require 'helm)
+  (require 'helm-swoop)
+  (require 'helm-bookmark)
   (require 'helm-projectile)
 
   (require 'ido)
@@ -586,7 +589,13 @@ you should place your code here."
   (defalias 'rr 'rust-save-compile-and-run)
   (defalias 'rt 'cargo-process-test)
 
+  (fset 'rust-ignore
+        (lambda (&optional arg) "Keyboard macro." (interactive "p")
+          (kmacro-exec-ring-item
+           (quote ([12 115 101 97 114 99 104 return 35 91 105 103 110 111 114 101 return 1 11 11 14] 0 "%d")) arg)))
 
+  ;; (with-eval-after-load 'helm
+  ;;   (setq helm-display-function 'helm-default-display-buffer))
   (add-hook 'dired-mode-hook
             (lambda () (local-set-key (kbd "r") 'dired-up-directory)))
   )
