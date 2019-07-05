@@ -70,6 +70,7 @@ values."
                                        merlin
                                        helm
                                        helm-projectile
+                                       helm-ag
                                        slim-mode
                                        coffee-mode
                                        nginx-mode lua-mode
@@ -383,7 +384,8 @@ you should place your code here."
   (defalias 'cm 'comment-region)
   (defalias 'uc 'uncomment-region)
   (defalias 'gf 'grep-find)
-  (defalias 'pg 'projectile-ag)
+  (defalias 'pg 'helm-projectile-ag)
+  (defalias 'p  'helm-resume)
   (defalias 'fd 'find-dired)
   (defalias 'e 'eshell)
   (defalias 'f 'projectile-find-file)
