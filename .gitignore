@@ -55,3 +55,7 @@ private/
 
 ido.last
 elpa/gnupg/
+
+/org
+.org-id-locations
+
