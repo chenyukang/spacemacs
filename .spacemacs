@@ -378,7 +378,7 @@ you should place your code here."
   (defalias 'idw 'ido-select-window)
   (defalias 'qrr 'query-replace)
   (defalias 'hi 'helm-imenu)
-  (defalias 'hf 'helm-projectile)
+  (defalias 'hf 'helm-projectile-find-file)
   (defalias 'hr 'helm-recentf)
   (defalias 'h 'helm-mini)
   (defalias 'cp 'copy-region-as-kill)
@@ -592,6 +592,8 @@ you should place your code here."
   (require 'org)
   (defalias 'ga 'org-agenda)
   (defalias 'gc 'org-capture)
+  (defalias 'oa 'org-agenda-list)
+  (defalias 'ot 'org-todo-list)
   (define-key global-map "\C-cl" 'smex)
   (define-key global-map "\C-ca" 'org-agenda)
   (setq org-log-done t)
@@ -602,8 +604,10 @@ you should place your code here."
 
   (add-hook 'org-after-todo-statistics-hook 'org-summary-todo)
   (setq org-agenda-custom-commands
-        '(("p" "List Non-done projects"
-           tags "+TODO=\"TODO\"")))
+        '(("x" agenda)
+          ("y" agenda*)
+          ("p" "List Non-done projects" tags "+TODO=\"TODO\"")
+          ("d" todo "DONE")))
 
   ;; 打开org-indent mode
   (setq org-startup-indented t)
@@ -615,15 +619,11 @@ you should place your code here."
         '((sequence "TODO(t)" "HAND(h)" "VERIFY(v)" "|" "DONE(d)")
           (sequence "|" "CANCELED(c)")))
 
-  ;; (setq org-todo-keywords
-  ;;       '((sequence "TODO" "HAND" "|" "DONE")))
-
   (setq org-image-actual-width nil)
   (setf org-todo-keyword-faces '(("TODO" . (:foreground "white" :background "#95A5A6"   :weight bold))
                                  ("HAND" . (:foreground "white" :background "#2E8B57"  :weight bold))
                                  ("VERIFY" . (:foreground "white" :background "#2F0B57"  :weight bold))
                                  ("DONE" . (:foreground "white" :background "#3498DB" :weight bold))))
-
 
   (require 'org-bullets)
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
@@ -637,17 +637,20 @@ you should place your code here."
           ("x" "Task" entry (file+datetree "~/Dropbox/org/work.org" "Tasks")
            "** TODO %^{priority|[#A]|[#B]|[#C]} %?\n")
           ("c" "Code snippet" entry (file+headline "~/Dropbox/org/snippets/code.org" "Code")
-           "** %^{desc}\n#+BEGIN_SRC %^{language|ruby|c|rust|shell|emacs-lisp}\n%?\n#+END_SRC")
-          ("l" "Journal" entry (file+datetree "~/Dropbox/org/learn.org")
-           "* %?\nEntered on %U\n  %i\n\n ")
+           "** %^{desc}\n#+BEGIN_SRC %^{language|ruby|shell|c|rust|emacs-lisp}\n%?\n#+END_SRC")
+          ("l" "Todo" entry (file+datetree "~/Dropbox/org/learn.org")
+           "** TODO %?\nEntered on %U\n  %i\n\n " :kill-buffer t)
           ("j" "Journal" entry (file+datetree "~/Dropbox/org/journal.org")
-           "* %?\nEntered on %U\n  %i\n\n ")))
+           "** %?\nEntered on %U\n  %i\n\n ")))
+
+  (setq org-agenda-skip-deadline-if-done t)
+  (setq org-agenda-skip-scheduled-if-done t)
+  (setq org-startup-with-inline-images t)
 
   (add-hook 'org-agenda-mode-hook
             (lambda ()
               (local-set-key (kbd "C-l") 'smex)))
   (define-key org-agenda-mode-map "l" 'smex)
-  (define-key org-agenda-mode-map "L" 'smex)
 
   (defun org-insert-image ()
     (interactive)
@@ -677,8 +680,6 @@ you should place your code here."
       (org-insert-link nil (concat "file:" new-file) "")
       (message new-file))
     )
-  (setq org-startup-with-inline-images t)
-
 
 
   (defun rust-save-compile-and-run ()
