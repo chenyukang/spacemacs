@@ -632,6 +632,8 @@ you should place your code here."
   (setq org-capture-templates
         '(("t" "Todo" entry (file+headline "~/Dropbox/org/work.org" "Tasks")
            "* TODO %?\n  %i\n ")
+          ("k" "Todo" entry (file+headline "~/Dropbox/org/learn.org" "Think")
+           "* TODO %?\n  %i\n %f\n %a")
           ("c" "Code snippet" entry (file+headline "~/Dropbox/org/snippets/code.org" "Code")
            "** %^{desc}\n#+BEGIN_SRC %^{language|ruby|c|rust|shell|emacs-lisp}\n%?\n#+END_SRC")
           ("j" "Journal" entry (file+datetree "~/Dropbox/org/journal.org")
