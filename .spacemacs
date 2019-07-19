@@ -371,13 +371,14 @@ you should place your code here."
   (smex-initialize)
   (global-set-key (kbd "C-j") 'helm-projectile)
   (global-set-key (kbd "C-l") 'smex)
+  (global-set-key (kbd "C-c l") 'smex)
   (global-set-key (kbd "C-=") 'dabbrev-expand)
   (global-set-key (kbd "C-s") 'isearch-forward)
 
   (defalias 'idw 'ido-select-window)
   (defalias 'qrr 'query-replace)
   (defalias 'hi 'helm-imenu)
-  (defalias 'hf 'helm-projectile)
+  (defalias 'hf 'helm-projectile-find-file)
   (defalias 'hr 'helm-recentf)
   (defalias 'h 'helm-mini)
   (defalias 'cp 'copy-region-as-kill)
@@ -504,9 +505,10 @@ you should place your code here."
   (setq cider-annotate-completion-function t)
 
 
-  (add-to-list 'load-path "~/.emacs.d/elpa/company-tabnine")
-  (require 'company-tabnine)
-  (add-to-list 'company-backends #'company-tabnine)
+  ;; (add-to-list 'load-path "~/.emacs.d/elpa/company-tabnine")
+  ;; (require 'company-tabnine)
+  ;; (add-to-list 'company-backends #'company-tabnine)
+
   (setq company-idle-delay 0)
   (setq company-show-numbers t)
   (company-tng-configure-default)
@@ -590,7 +592,9 @@ you should place your code here."
   (require 'org)
   (defalias 'ga 'org-agenda)
   (defalias 'gc 'org-capture)
-  (define-key global-map "\C-cl" 'org-store-link)
+  (defalias 'oa 'org-agenda-list)
+  (defalias 'ot 'org-todo-list)
+  (define-key global-map "\C-cl" 'smex)
   (define-key global-map "\C-ca" 'org-agenda)
   (setq org-log-done t)
   (defun org-summary-todo (n-done n-not-done)
@@ -600,8 +604,10 @@ you should place your code here."
 
   (add-hook 'org-after-todo-statistics-hook 'org-summary-todo)
   (setq org-agenda-custom-commands
-        '(("p" "List Non-done projects"
-           tags "+TODO=\"TODO\"")))
+        '(("x" agenda)
+          ("y" agenda*)
+          ("p" "List Non-done projects" tags "+TODO=\"TODO\"")
+          ("d" todo "DONE")))
 
   ;; 打开org-indent mode
   (setq org-startup-indented t)
@@ -613,15 +619,11 @@ you should place your code here."
         '((sequence "TODO(t)" "HAND(h)" "VERIFY(v)" "|" "DONE(d)")
           (sequence "|" "CANCELED(c)")))
 
-  ;; (setq org-todo-keywords
-  ;;       '((sequence "TODO" "HAND" "|" "DONE")))
-
   (setq org-image-actual-width nil)
   (setf org-todo-keyword-faces '(("TODO" . (:foreground "white" :background "#95A5A6"   :weight bold))
                                  ("HAND" . (:foreground "white" :background "#2E8B57"  :weight bold))
                                  ("VERIFY" . (:foreground "white" :background "#2F0B57"  :weight bold))
                                  ("DONE" . (:foreground "white" :background "#3498DB" :weight bold))))
-
 
   (require 'org-bullets)
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
@@ -630,14 +632,28 @@ you should place your code here."
                                "~/Dropbox/org/learn.org"))
 
   (setq org-capture-templates
-        '(("t" "Todo" entry (file+headline "~/Dropbox/org/work.org" "Tasks")
-           "* TODO %?\n  %i\n ")
-          ("k" "Todo" entry (file+headline "~/Dropbox/org/learn.org" "Think")
+        '(("t" "Todo" entry (file+datetree "~/Dropbox/org/work.org" "Tasks")
+           "** TODO %?\n  %i\n ")
+          ("x" "Task" entry (file+datetree "~/Dropbox/org/work.org" "Tasks")
+           "** TODO %^{priority|[#A]|[#B]|[#C]} %?\n")
+          ("l" "Todo" entry (file+datetree "~/Dropbox/org/learn.org")
+           "** TODO %?\nEntered on %U\n  %i\n\n " :kill-buffer t)
+          ("k" "Todo" entry (file+datetree "~/Dropbox/org/learn.org" "Tasks")
            "* TODO %?\n  %i\n %f\n %a")
-          ("c" "Code snippet" entry (file+headline "~/Dropbox/org/snippets/code.org" "Code")
-           "** %^{desc}\n#+BEGIN_SRC %^{language|ruby|c|rust|shell|emacs-lisp}\n%?\n#+END_SRC")
           ("j" "Journal" entry (file+datetree "~/Dropbox/org/journal.org")
-           "* %?\nEntered on %U\n  %i\n\n ")))
+           "** %?\nEntered on %U\n  %i\n\n ")
+          ("c" "Code snippet" entry (file+headline "~/Dropbox/org/snippets/code.org" "Code")
+           "** %^{desc}\n#+BEGIN_SRC %^{language|ruby|shell|c|rust|emacs-lisp}\n%?\n#+END_SRC")
+          ))
+
+  (setq org-agenda-skip-deadline-if-done t)
+  (setq org-agenda-skip-scheduled-if-done t)
+  (setq org-startup-with-inline-images t)
+
+  (add-hook 'org-agenda-mode-hook
+            (lambda ()
+              (local-set-key (kbd "C-l") 'smex)))
+  (define-key org-agenda-mode-map "l" 'smex)
 
   (defun org-insert-image ()
     (interactive)
@@ -667,8 +683,6 @@ you should place your code here."
       (org-insert-link nil (concat "file:" new-file) "")
       (message new-file))
     )
-  (setq org-startup-with-inline-images t)
-
 
 
   (defun rust-save-compile-and-run ()
@@ -712,7 +726,7 @@ you should place your code here."
  '(highlight-symbol-idle-delay 0.5)
  '(package-selected-packages
    (quote
-    (org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-mime org-download htmlize gnuplot graphviz-dot-mode powerline hydra avy anzu iedit smartparens highlight evil goto-chg undo-tree projectile async f dash yapfify reveal-in-osx-finder pyvenv pytest pyenv-mode py-isort pip-requirements pbcopy osx-trash osx-dictionary live-py-mode launchctl insert-shebang hy-mode fish-mode cython-mode anaconda-mode pythonic helm-gitignore git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter flyspell-correct-ivy flyspell-correct-helm flyspell-correct diff-hl auto-dictionary helm helm-core zenburn-theme yaml-mode web-mode web-beautify utop tuareg caml toml-mode tagedit stickyfunc-enhance srefactor smeargle slim-mode scss-mode sass-mode rvm ruby-tools ruby-test-mode rubocop rspec-mode robe rbenv racer quickrun pug-mode projectile-rails rake phpunit phpcbf php-extras php-auto-yasnippets orgit ocp-indent nginx-mode mmm-mode minitest merlin markdown-toc magit-gitflow magit-popup lua-mode livid-mode skewer-mode simple-httpd less-css-mode json-mode json-snatcher json-reformat js2-refactor js2-mode js-doc highlight-symbol haml-mode go-guru go-eldoc gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md fuzzy flymake-ruby flymake-easy flycheck-rust flycheck-pos-tip pos-tip flycheck feature-mode evil-magit magit transient git-commit with-editor erlang engine-mode emmet-mode drupal-mode php-mode disaster company-web web-completion-data company-tern dash-functional tern company-statistics company-go go-mode company-c-headers company coffee-mode cmake-mode clojure-snippets clj-refactor inflections edn multiple-cursors paredit peg clang-format cider-eval-sexp-fu cider sesman queue parseedn clojure-mode parseclj a chruby cargo markdown-mode rust-mode bundler inf-ruby auto-yasnippet yasnippet ag ac-ispell auto-complete wgrep smex ivy-hydra lv counsel-projectile counsel swiper ivy ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu elisp-slime-nav dumb-jump diminish define-word column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line))))
+    (unicode-escape names org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-mime org-download htmlize gnuplot graphviz-dot-mode powerline hydra avy anzu iedit smartparens highlight evil goto-chg undo-tree projectile async f dash yapfify reveal-in-osx-finder pyvenv pytest pyenv-mode py-isort pip-requirements pbcopy osx-trash osx-dictionary live-py-mode launchctl insert-shebang hy-mode fish-mode cython-mode anaconda-mode pythonic helm-gitignore git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter flyspell-correct-ivy flyspell-correct-helm flyspell-correct diff-hl auto-dictionary helm helm-core zenburn-theme yaml-mode web-mode web-beautify utop tuareg caml toml-mode tagedit stickyfunc-enhance srefactor smeargle slim-mode scss-mode sass-mode rvm ruby-tools ruby-test-mode rubocop rspec-mode robe rbenv racer quickrun pug-mode projectile-rails rake phpunit phpcbf php-extras php-auto-yasnippets orgit ocp-indent nginx-mode mmm-mode minitest merlin markdown-toc magit-gitflow magit-popup lua-mode livid-mode skewer-mode simple-httpd less-css-mode json-mode json-snatcher json-reformat js2-refactor js2-mode js-doc highlight-symbol haml-mode go-guru go-eldoc gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md fuzzy flymake-ruby flymake-easy flycheck-rust flycheck-pos-tip pos-tip flycheck feature-mode evil-magit magit transient git-commit with-editor erlang engine-mode emmet-mode drupal-mode php-mode disaster company-web web-completion-data company-tern dash-functional tern company-statistics company-go go-mode company-c-headers company coffee-mode cmake-mode clojure-snippets clj-refactor inflections edn multiple-cursors paredit peg clang-format cider-eval-sexp-fu cider sesman queue parseedn clojure-mode parseclj a chruby cargo markdown-mode rust-mode bundler inf-ruby auto-yasnippet yasnippet ag ac-ispell auto-complete wgrep smex ivy-hydra lv counsel-projectile counsel swiper ivy ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu elisp-slime-nav dumb-jump diminish define-word column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
