@@ -632,13 +632,13 @@ you should place your code here."
                                "~/Dropbox/org/learn.org"))
 
   (setq org-capture-templates
-        '(("t" "Todo" entry (file+datetree "~/Dropbox/org/work.org" "Tasks")
+        '(("t" "Todo" entry (file+datetree "~/Dropbox/org/work.org")
            "** TODO %?\n  %i\n ")
-          ("x" "Task" entry (file+datetree "~/Dropbox/org/work.org" "Tasks")
+          ("x" "Task" entry (file+datetree "~/Dropbox/org/work.org")
            "** TODO %^{priority|[#A]|[#B]|[#C]} %?\n")
           ("l" "Todo" entry (file+datetree "~/Dropbox/org/learn.org")
            "** TODO %?\nEntered on %U\n  %i\n\n " :kill-buffer t)
-          ("k" "Todo" entry (file+datetree "~/Dropbox/org/learn.org" "Tasks")
+          ("k" "Todo" entry (file+datetree "~/Dropbox/org/learn.org")
            "* TODO %?\n  %i\n %f\n %a")
           ("j" "Journal" entry (file+datetree "~/Dropbox/org/journal.org")
            "** %?\nEntered on %U\n  %i\n\n ")
@@ -707,9 +707,6 @@ you should place your code here."
   ;;   (setq helm-display-function 'helm-default-display-buffer))
   (add-hook 'dired-mode-hook
             (lambda () (local-set-key (kbd "r") 'dired-up-directory)))
-
-
-
 
   )
 
