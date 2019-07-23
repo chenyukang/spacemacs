@@ -524,6 +524,36 @@ you should place your code here."
   (add-hook 'after-init-hook 'global-company-mode)
   (add-hook 'eshell-mode-hook (lambda () (company-mode -1)))
 
+
+  (defun ora-company-number ()
+    "Forward to `company-complete-number'.
+
+Unless the number is potentially part of the candidate.
+In that case, insert the number."
+    (interactive)
+    (let* ((k (this-command-keys))
+           (re (concat "^" company-prefix k)))
+      (if (cl-find-if (lambda (s) (string-match re s))
+                      company-candidates)
+          (self-insert-command 1)
+        (company-complete-number (string-to-number k)))))
+
+  (setq company-idle-delay 0.3)
+  (setq company-minimum-prefix-length 2)
+  (setq company-selection-wrap-around t)
+  
+  (let ((map company-active-map))
+    (mapc
+     (lambda (x)
+       (define-key map (format "%d" x) 'ora-company-number))
+     (number-sequence 0 9))
+    (define-key map " " (lambda ()
+                          (interactive)
+                          (company-abort)
+                          (self-insert-command 1)))
+    (define-key map (kbd "<return>") nil))
+
+
   (require 'zenburn-theme)
 
   (defun open-eshell-now ()
@@ -631,31 +661,48 @@ you should place your code here."
                                "~/Dropbox/org/habit.org"
                                "~/Dropbox/org/learn.org"))
 
-  (setq org-capture-templates
-        '(("t" "Todo" entry (file+datetree "~/Dropbox/org/work.org")
-           "** TODO %?\n  %i\n ")
-          ("x" "Task" entry (file+datetree "~/Dropbox/org/work.org")
-           "** TODO %^{priority|[#A]|[#B]|[#C]} %?\n")
-          ("e" "Task" entry (file+datetree "~/Dropbox/org/life.org")
-           "** TODO %^{priority|[#A]|[#B]|[#C]} %?\n")
-          ("l" "Todo" entry (file+datetree "~/Dropbox/org/learn.org")
-           "** TODO %?\nEntered on %U\n  %i\n\n " :kill-buffer t)
-          ("k" "Todo" entry (file+datetree "~/Dropbox/org/learn.org")
-           "* TODO %?\n  %i\n %f\n %a")
-          ("j" "Journal" entry (file+datetree "~/Dropbox/org/journal.org")
-           "** %?\nEntered on %U\n  %i\n\n")
-          ("c" "Code snippet" entry (file+headline "~/Dropbox/org/snippets/code.org" "Code")
-           "** %^{desc}\n#+BEGIN_SRC %^{language|ruby|shell|c|rust|emacs-lisp}\n%?\n#+END_SRC")
-          ))
-
   (setq org-agenda-skip-deadline-if-done t)
   (setq org-agenda-skip-scheduled-if-done t)
   (setq org-startup-with-inline-images t)
+
+  (defun create-code-file ()
+    "Create an org file in ~/notes/snippets."
+    (interactive)
+    (let ((name (concat (format-time-string "%Y_%m_%d_")
+                         (read-string "file-name: "))))
+      (expand-file-name (format "%s.org" name) "~/Dropbox/org/snippets/")))
+
+  (defun gen-date-file ()
+    "Create an org file in ~/notes/snippets."
+    (format-time-string "~/Dropbox/org/journals/%Y_%m_%d.org"))
+
+  (setq org-capture-templates
+        '(("t" "Todo" entry (file+datetree "~/Dropbox/org/work.org")
+           "** TODO %?\n  %i\n " :empty-lines 1)
+          ("x" "Task" entry (file+datetree "~/Dropbox/org/work.org")
+           "** TODO %^{priority|[#A]|[#B]|[#C]} %?\n")
+          ("e" "Task" entry (file+datetree "~/Dropbox/org/life.org")
+           "** TODO %^{priority|[#A]|[#B]|[#C]} %?\n" :empty-lines 1)
+          ("l" "Todo" entry (file+datetree "~/Dropbox/org/learn.org")
+           "** TODO %?\nEntered on %U\n  %i\n\n " :kill-buffer t :empty-lines 1)
+          ("k" "Todo" entry (file+datetree "~/Dropbox/org/learn.org")
+           "* TODO %?\n  %i\n %f\n %a" :empty-lines 1)
+          ("j" "Journal" entry (file+datetree "~/Dropbox/org/_journal.org" )
+           "** %?\nEntered on %U\n  %i\n" :empty-lines 1)
+          ("J" "Journal" entry (file gen-date-file)
+           "** %?\nEntered on %U\n  %i\n" :empty-lines 1)
+          ("c" "Code snippet" entry (file+headline "~/Dropbox/org/_code.org" "Code")
+           "** %^{desc}\n#+BEGIN_SRC %^{language|ruby|shell|c|rust|emacs-lisp}\n%?\n#+END_SRC" :empty-lines 1)
+          ("C" "Notes" entry (file create-code-file)
+           "** %^{desc}\n#+BEGIN_SRC %^{language|ruby|shell|c|rust|emacs-lisp}\n%?\n#+END_SRC" :empty-lines 1)
+          ))
+
 
   (add-hook 'org-agenda-mode-hook
             (lambda ()
               (local-set-key (kbd "C-l") 'smex)))
   (define-key org-agenda-mode-map "l" 'smex)
+  (org-defkey org-agenda-mode-map "\C-l" 'smex)
 
   (defun org-insert-image ()
     (interactive)
@@ -719,7 +766,7 @@ you should place your code here."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(company-tabnine-max-num-results 5)
+ ;;'(company-tabnine-max-num-results 5)
  '(global-hl-line-mode t)
  '(highlight-symbol-foreground-color "keyboardFocusIndicatorColor")
  '(highlight-symbol-idle-delay 0.5)
