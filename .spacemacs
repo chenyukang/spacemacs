@@ -413,6 +413,15 @@ you should place your code here."
   (defalias 'hs 'swiper)
   (defalias 'ms 'magit-status)
 
+  (defun gen-temp-file ()
+    "Create an org file in ~/notes/snippets."
+    (interactive)
+    (let ((name (concat (format-time-string "%d_%m_%Y_%s_")
+                        (read-string "file-name: "))))
+      (find-file (expand-file-name name "/tmp/"))))
+
+  (defalias 'gt 'gen-temp-file)
+
   (defun get-continue-string ()
     (interactive)
     (skip-chars-backward "^ \t\n\"\'\(\)\<\>\!\&\;\\\[\]")
@@ -672,6 +681,7 @@ In that case, insert the number."
                          (read-string "file-name: "))))
       (expand-file-name (format "%s.org" name) "~/Dropbox/org/snippets/")))
 
+
   (defun gen-date-file ()
     "Create an org file in ~/notes/snippets."
     (format-time-string "~/Dropbox/org/journals/%Y_%m_%d.org"))
@@ -696,7 +706,6 @@ In that case, insert the number."
           ("C" "Notes" entry (file create-code-file)
            "** %^{desc}\n#+BEGIN_SRC %^{language|ruby|shell|c|rust|emacs-lisp}\n%?\n#+END_SRC" :empty-lines 1)
           ))
-
 
   (add-hook 'org-agenda-mode-hook
             (lambda ()
