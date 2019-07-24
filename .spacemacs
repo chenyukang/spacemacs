@@ -339,6 +339,7 @@ you should place your code here."
 
   (setq powerline-default-separator nil)
   (ido-vertical-mode -1)
+  (setq-default fill-column 80)
 
   (require 'helm)
   (require 'helm-swoop)
@@ -666,11 +667,17 @@ In that case, insert the number."
   (setq org-startup-with-inline-images t)
 
   (defun create-code-file ()
-    "Create an org file in ~/notes/snippets."
     (interactive)
     (let ((name (concat (format-time-string "%Y_%m_%d_")
                          (read-string "file-name: "))))
       (expand-file-name (format "%s.org" name) "~/Dropbox/org/snippets/")))
+
+
+  (defun create-note-file ()
+    (interactive)
+    (let ((name (concat (format-time-string "%Y_%m_%d_")
+                        (read-string "file-name: "))))
+      (expand-file-name (format "%s.org" name) "~/Dropbox/org/notes/")))
 
   (defun gen-date-file ()
     "Create an org file in ~/notes/snippets."
@@ -685,6 +692,8 @@ In that case, insert the number."
            "** TODO %^{priority|[#A]|[#B]|[#C]} %?\n" :empty-lines 1)
           ("l" "Todo" entry (file+datetree "~/Dropbox/org/learn.org")
            "** TODO %?\nEntered on %U\n  %i\n\n " :kill-buffer t :empty-lines 1)
+          ("n" "Notes" entry (file create-note-file)
+           "** %^{desc}\n " :empty-lines 1)
           ("k" "Todo" entry (file+datetree "~/Dropbox/org/learn.org")
            "* TODO %?\n  %i\n %f\n %a" :empty-lines 1)
           ("j" "Journal" entry (file+datetree "~/Dropbox/org/_journal.org" )
@@ -717,6 +726,7 @@ In that case, insert the number."
       (org-insert-link nil (concat "file:" image-file) ""))
     ;; (org-display-inline-images) ;; inline显示图片
     )
+
   (defun org-insert-file (file-path)
     "insert a file in org"
     (interactive (list (read-buffer (format "path: " ) (current-kill 0) t)))
