@@ -340,7 +340,7 @@ you should place your code here."
 
   (setq powerline-default-separator nil)
   (ido-vertical-mode -1)
-  (setq-default fill-column 84)
+  (setq-default fill-column 90)
 
   (require 'helm)
   (require 'helm-swoop)
@@ -639,6 +639,7 @@ In that case, insert the number."
   (define-key global-map "\C-cl" 'smex)
   (define-key global-map "\C-ca" 'org-agenda)
   (setq org-log-done t)
+
   (defun org-summary-todo (n-done n-not-done)
     "Switch entry to DONE when all subentries are done, to TODO otherwise."
     (let (org-log-done org-log-states)   ; turn off logging
@@ -721,7 +722,7 @@ In that case, insert the number."
   (add-hook 'org-agenda-mode-hook
             (lambda ()
               (local-set-key (kbd "C-l") 'smex)))
-  
+
   (defun org-insert-image ()
     (interactive)
     (let* ((path (concat default-directory "img/"))
@@ -733,7 +734,7 @@ In that case, insert the number."
           (mkdir path))
       (shell-command (concat "pngpaste " image-file))
       (org-insert-link nil (concat "file:" image-file) ""))
-    ;; (org-display-inline-images) ;; inline显示图片
+    ;; (org-display-inline-images) ;; inline 显示图片
     )
 
   (defun org-insert-file (file-path)
@@ -751,6 +752,7 @@ In that case, insert the number."
       (org-insert-link nil (concat "file:" new-file) "")
       (message new-file))
     )
+  (defalias 'ois 'org-insert-structure-template)
 
   (defun org-publish-to-hexo ()
     "insert a file in org"
@@ -773,8 +775,22 @@ In that case, insert the number."
     (when (eq major-mode 'org-mode)
       (message "saving org-file")
       (pangu-spacing-space-current-buffer)
-      (fill-region (point-min) (point-max))
+      ;;(fill-region (point-min) (point-max))
       ))
+
+  (add-hook 'org-mode-hook
+            (lambda ()
+              ;; Enable fill column indicator
+              ;;(fci-mode t)
+              ;; Turn off line numbering, it makes org so slow
+              (linum-mode -1)
+              ;; Set fill column to 79
+              (setq fill-column 90)
+              (org-indent-mode)
+              ;;(visual-line-mode)
+              ;; Enable automatic line wrapping at fill column
+              (auto-fill-mode t)
+              ))
 
   (add-hook 'before-save-hook #'org-before-save-hook)
 
