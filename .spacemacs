@@ -685,7 +685,6 @@ In that case, insert the number."
                          (read-string "file-name: "))))
       (expand-file-name (format "%s.org" name) "~/Dropbox/org/snippets/")))
 
-
   (defun create-note-file ()
     (interactive)
     (let ((name (concat (format-time-string "%Y_%m_%d_")
@@ -767,16 +766,6 @@ In that case, insert the number."
   (setq org-reveal-root "file:///Users/kang/code/reveal.js")
   (setq org-reveal-title-slide nil)
 
-  (require 'pangu-spacing)
-  (global-pangu-spacing-mode 1)
-  ;;(setq pangu-spacing-real-insert-separtor t)
-
-  (defun org-before-save-hook ()
-    (when (eq major-mode 'org-mode)
-      (message "saving org-file")
-      (pangu-spacing-space-current-buffer)
-      ;;(fill-region (point-min) (point-max))
-      ))
 
   (add-hook 'org-mode-hook
             (lambda ()
@@ -791,6 +780,17 @@ In that case, insert the number."
               ;; Enable automatic line wrapping at fill column
               (auto-fill-mode t)
               ))
+
+  (require 'pangu-spacing)
+  (global-pangu-spacing-mode 1)
+  ;;(setq pangu-spacing-real-insert-separtor t)
+
+  (defun org-before-save-hook ()
+    (when (eq major-mode 'org-mode)
+      (message "saving org-file")
+      (pangu-spacing-space-current-buffer)
+      ;;(fill-region (point-min) (point-max))
+      ))
 
   (add-hook 'before-save-hook #'org-before-save-hook)
 
