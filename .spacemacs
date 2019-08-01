@@ -508,7 +508,6 @@ you should place your code here."
 
   (require 'company)
   (global-company-mode)
-  (global-company-mode)
   (add-hook 'cider-repl-mode-hook #'company-mode)
   (add-hook 'cider-mode-hook #'company-mode)
   (add-hook 'cider-repl-mode-hook #'cider-company-enable-fuzzy-completion)
@@ -552,7 +551,7 @@ In that case, insert the number."
   (setq company-idle-delay 0.3)
   (setq company-minimum-prefix-length 2)
   (setq company-selection-wrap-around t)
-  
+
   (let ((map company-active-map))
     (mapc
      (lambda (x)
@@ -563,7 +562,8 @@ In that case, insert the number."
                           (company-abort)
                           (self-insert-command 1)))
     (define-key map (kbd "<return>") nil))
-
+  (define-key company-active-map (kbd "C-SPC") #'company-complete-selection)
+  (define-key company-active-map (kbd "<return>") #'company-complete-selection)
 
   (require 'zenburn-theme)
 
@@ -753,19 +753,11 @@ In that case, insert the number."
     )
   (defalias 'ois 'org-insert-structure-template)
 
-  (defun org-publish-to-hexo ()
-    "insert a file in org"
-    (interactive)
-    (shell-command (concat
-                    "org-ruby " "--translate " "markdown " "-a "
-                    (buffer-name))))
-  (defalias 'op 'org-publish-to-hexo)
 
   (add-to-load-path "~/.emacs.d/private/local/org-reveal/")
   (require 'ox-reveal)
   (setq org-reveal-root "file:///Users/kang/code/reveal.js")
   (setq org-reveal-title-slide nil)
-
 
   (add-hook 'org-mode-hook
             (lambda ()
@@ -774,7 +766,7 @@ In that case, insert the number."
               (linum-mode -1)
               ;; Set fill column to 79
               (setq fill-column 90)
-              (org-indent-mode)
+              ;;(org-indent-mode)
               ;;(visual-line-mode)
               ;; Enable automatic line wrapping at fill column
               (auto-fill-mode t)
@@ -784,13 +776,35 @@ In that case, insert the number."
   (global-pangu-spacing-mode 1)
   ;;(setq pangu-spacing-real-insert-separtor t)
 
+  (defun org-publish-to-hexo ()
+    (interactive)
+    (shell-command (concat
+                    "org-ruby " "--translate " "markdown " "-a "
+                    (buffer-name))))
+  (defalias 'op 'org-publish-to-hexo)
+
+  (defun buffer-contains-substring (string)
+    (save-excursion
+      (save-match-data
+        (goto-char (point-min))
+        (search-forward string nil t))))
+
+
+  (defun org-auto-publish-save-hook ()
+    (when (and (eq major-mode 'org-mode)
+               (buffer-contains-substring "#+MD_TITLE:")
+               (buffer-contains-substring "#+MD_PATH:"))
+      (message "publishing to Hexo markdown")
+      (org-publish-to-hexo)))
+
+  (add-hook 'after-save-hook #'org-auto-publish-save-hook)
+
   (defun org-before-save-hook ()
     (when (eq major-mode 'org-mode)
       (message "saving org-file")
       (pangu-spacing-space-current-buffer)
       ;;(fill-region (point-min) (point-max))
       ))
-
   (add-hook 'before-save-hook #'org-before-save-hook)
 
   (defun rust-save-compile-and-run ()
@@ -805,6 +819,7 @@ In that case, insert the number."
 
   (defalias 'rr 'rust-save-compile-and-run)
   (defalias 'rt 'cargo-process-test)
+  (defalias 'hb 'helm-bookmarks)
 
   (fset 'rust-ignore
         (lambda (&optional arg) "Keyboard macro." (interactive "p")
