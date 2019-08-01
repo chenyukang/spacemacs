@@ -771,7 +771,6 @@ In that case, insert the number."
             (lambda ()
               ;; Enable fill column indicator
               ;;(fci-mode t)
-              ;; Turn off line numbering, it makes org so slow
               (linum-mode -1)
               ;; Set fill column to 79
               (setq fill-column 90)
