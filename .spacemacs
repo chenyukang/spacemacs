@@ -771,7 +771,7 @@ In that case, insert the number."
               ;; Enable automatic line wrapping at fill column
               (auto-fill-mode t)
               ))
-
+  
   (require 'pangu-spacing)
   (global-pangu-spacing-mode 1)
   ;;(setq pangu-spacing-real-insert-separtor t)
@@ -780,7 +780,9 @@ In that case, insert the number."
     (interactive)
     (shell-command (concat
                     "org-ruby " "--translate " "markdown " "-a "
-                    (buffer-name))))
+                    (buffer-name)
+                    " 2>/dev/null "
+                    )))
   (defalias 'op 'org-publish-to-hexo)
 
   (defun buffer-contains-substring (string)
@@ -788,7 +790,6 @@ In that case, insert the number."
       (save-match-data
         (goto-char (point-min))
         (search-forward string nil t))))
-
 
   (defun org-auto-publish-save-hook ()
     (when (and (eq major-mode 'org-mode)
