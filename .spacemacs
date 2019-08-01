@@ -685,7 +685,6 @@ In that case, insert the number."
                          (read-string "file-name: "))))
       (expand-file-name (format "%s.org" name) "~/Dropbox/org/snippets/")))
 
-
   (defun create-note-file ()
     (interactive)
     (let ((name (concat (format-time-string "%Y_%m_%d_")
@@ -754,29 +753,11 @@ In that case, insert the number."
     )
   (defalias 'ois 'org-insert-structure-template)
 
-  (defun org-publish-to-hexo ()
-    "insert a file in org"
-    (interactive)
-    (shell-command (concat
-                    "org-ruby " "--translate " "markdown " "-a "
-                    (buffer-name))))
-  (defalias 'op 'org-publish-to-hexo)
 
   (add-to-load-path "~/.emacs.d/private/local/org-reveal/")
   (require 'ox-reveal)
   (setq org-reveal-root "file:///Users/kang/code/reveal.js")
   (setq org-reveal-title-slide nil)
-
-  (require 'pangu-spacing)
-  ;;(global-pangu-spacing-mode 1)
-  ;;(setq pangu-spacing-real-insert-separtor t)
-
-  (defun org-before-save-hook ()
-    (when (eq major-mode 'org-mode)
-      (message "saving org-file")
-      (pangu-spacing-space-current-buffer)
-      ;;(fill-region (point-min) (point-max))
-      ))
 
   (add-hook 'org-mode-hook
             (lambda ()
@@ -792,6 +773,39 @@ In that case, insert the number."
               (auto-fill-mode t)
               ))
 
+  (require 'pangu-spacing)
+  (global-pangu-spacing-mode 1)
+  ;;(setq pangu-spacing-real-insert-separtor t)
+
+  (defun org-publish-to-hexo ()
+    (interactive)
+    (shell-command (concat
+                    "org-ruby " "--translate " "markdown " "-a "
+                    (buffer-name))))
+  (defalias 'op 'org-publish-to-hexo)
+
+  (defun buffer-contains-substring (string)
+    (save-excursion
+      (save-match-data
+        (goto-char (point-min))
+        (search-forward string nil t))))
+
+
+  (defun org-auto-publish-save-hook ()
+    (when (and (eq major-mode 'org-mode)
+               (buffer-contains-substring "#+MD_TITLE:")
+               (buffer-contains-substring "#+MD_PATH:"))
+      (message "publishing to Hexo markdown")
+      (org-publish-to-hexo)))
+
+  (add-hook 'after-save-hook #'org-auto-publish-save-hook)
+
+  (defun org-before-save-hook ()
+    (when (eq major-mode 'org-mode)
+      (message "saving org-file")
+      (pangu-spacing-space-current-buffer)
+      ;;(fill-region (point-min) (point-max))
+      ))
   (add-hook 'before-save-hook #'org-before-save-hook)
 
   (defun rust-save-compile-and-run ()
