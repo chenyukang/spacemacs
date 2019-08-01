@@ -508,7 +508,6 @@ you should place your code here."
 
   (require 'company)
   (global-company-mode)
-  (global-company-mode)
   (add-hook 'cider-repl-mode-hook #'company-mode)
   (add-hook 'cider-mode-hook #'company-mode)
   (add-hook 'cider-repl-mode-hook #'cider-company-enable-fuzzy-completion)
@@ -552,7 +551,7 @@ In that case, insert the number."
   (setq company-idle-delay 0.3)
   (setq company-minimum-prefix-length 2)
   (setq company-selection-wrap-around t)
-  
+
   (let ((map company-active-map))
     (mapc
      (lambda (x)
@@ -563,7 +562,8 @@ In that case, insert the number."
                           (company-abort)
                           (self-insert-command 1)))
     (define-key map (kbd "<return>") nil))
-
+  (define-key company-active-map (kbd "C-SPC") #'company-complete-selection)
+  (define-key company-active-map (kbd "<return>") #'company-complete-selection)
 
   (require 'zenburn-theme)
 
@@ -768,7 +768,7 @@ In that case, insert the number."
   (setq org-reveal-title-slide nil)
 
   (require 'pangu-spacing)
-  (global-pangu-spacing-mode 1)
+  ;;(global-pangu-spacing-mode 1)
   ;;(setq pangu-spacing-real-insert-separtor t)
 
   (defun org-before-save-hook ()
@@ -786,7 +786,7 @@ In that case, insert the number."
               (linum-mode -1)
               ;; Set fill column to 79
               (setq fill-column 90)
-              (org-indent-mode)
+              ;;(org-indent-mode)
               ;;(visual-line-mode)
               ;; Enable automatic line wrapping at fill column
               (auto-fill-mode t)
@@ -806,6 +806,7 @@ In that case, insert the number."
 
   (defalias 'rr 'rust-save-compile-and-run)
   (defalias 'rt 'cargo-process-test)
+  (defalias 'hb 'helm-bookmarks)
 
   (fset 'rust-ignore
         (lambda (&optional arg) "Keyboard macro." (interactive "p")
