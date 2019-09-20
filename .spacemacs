@@ -82,6 +82,8 @@ values."
                                        racer
                                        pangu-spacing
                                        highlight-symbol
+                                       xml-rpc
+                                       metaweblog
                                        )
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
@@ -740,72 +742,10 @@ In that case, insert the number."
             (lambda ()
               (local-set-key (kbd "C-l") 'smex)))
 
-  ;; if (aspell installed) { use aspell}
-;; else if (hunspell installed) { use hunspell }
-;; whatever spell checker I use, I always use English dictionary
-;; I prefer use aspell because:
-;; 1. aspell is older
-;; 2. looks Kevin Atkinson still get some road map for aspell:
-;; @see http://lists.gnu.org/archive/html/aspell-announce/2011-09/msg00000.html
-(defun flyspell-detect-ispell-args (&optional run-together)
-  "if RUN-TOGETHER is true, spell check the CamelCase words."
-  (let (args)
-    (cond
-     ((string-match  "aspell$" ispell-program-name)
-      ;; Force the English dictionary for aspell
-      ;; Support Camel Case spelling check (tested with aspell 0.6)
-      (setq args (list "--sug-mode=ultra" "--lang=en_US"))
-      (if run-together
-          (setq args (append args '("--run-together"))))
-     ((string-match "hunspell$" ispell-program-name)
-      ;; Force the English dictionary for hunspell
-      (setq args "-d en_US")))
-    args)))
-
-  (cond
-   ((executable-find "aspell")
-    ;; you may also need `ispell-extra-args'
-    (setq ispell-program-name "aspell"))
-   ((executable-find "hunspell")
-    (setq ispell-program-name "hunspell")
-
-    ;; Please note that `ispell-local-dictionary` itself will be passed to hunspell cli with "-d"
-    ;; it's also used as the key to lookup ispell-local-dictionary-alist
-    ;; if we use different dictionary
-    (setq ispell-local-dictionary "en_US")
-    (setq ispell-local-dictionary-alist
-          '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8))))
-   (t (setq ispell-program-name nil)))
-
-  ;; ispell-cmd-args is useless, it's the list of *extra* arguments we will append to the ispell process when "ispell-word" is called.
-  ;; ispell-extra-args is the command arguments which will *always* be used when start ispell process
-  ;; Please note when you use hunspell, ispell-extra-args will NOT be used.
-  ;; Hack ispell-local-dictionary-alist instead.
-  (setq-default ispell-extra-args (flyspell-detect-ispell-args t))
-  ;; (setq ispell-cmd-args (flyspell-detect-ispell-args))
-  (defadvice ispell-word (around my-ispell-word activate)
-    (let ((old-ispell-extra-args ispell-extra-args))
-      (ispell-kill-ispell t)
-      (setq ispell-extra-args (flyspell-detect-ispell-args))
-      ad-do-it
-      (setq ispell-extra-args old-ispell-extra-args)
-      (ispell-kill-ispell t)))
-
-  (defadvice flyspell-auto-correct-word (around my-flyspell-auto-correct-word activate)
-    (let ((old-ispell-extra-args ispell-extra-args))
-      (ispell-kill-ispell t)
-      ;; use emacs original arguments
-      (setq ispell-extra-args (flyspell-detect-ispell-args))
-      ad-do-it
-      ;; restore our own ispell arguments
-      (setq ispell-extra-args old-ispell-extra-args)
-      (ispell-kill-ispell t)))
-
-  (defun text-mode-hook-setup ()
-    ;; Turn off RUN-TOGETHER option when spell check text-mode
-    (setq-local ispell-extra-args (flyspell-detect-ispell-args)))
-  (add-hook 'text-mode-hook 'text-mode-hook-setup)
-
+  ;; find aspell and hunspell automatically
+  (setq ispell-program-name "aspell")
+    ;; Please note ispell-extra-args contains ACTUAL parameters passed to aspell
+  (setq ispell-extra-args '("--sug-mode=ultra" "--lang=en_US"))
 
   (defun org-insert-image ()
     (interactive)
@@ -848,15 +788,23 @@ In that case, insert the number."
             (lambda ()
               ;; Enable fill column indicator
               ;;(fci-mode t)
-              ;; Turn off line numbering, it makes org so slow
               (linum-mode -1)
               ;; Set fill column to 79
               (setq fill-column 90)
               ;;(org-indent-mode)
               ;;(visual-line-mode)
               ;; Enable automatic line wrapping at fill column
-              (auto-fill-mode t)
-              ))
+              (auto-fill-mode t)))
+
+  (setq org-startup-folded "showall")
+
+  (defun org-show-three-levels ()
+    (interactive)
+    (org-content 3))
+
+  (add-hook 'org-mode-hook
+            (lambda ()
+              (define-key org-mode-map "\C-cm" 'org-show-three-levels)))
 
   (require 'pangu-spacing)
   (global-pangu-spacing-mode 1)
@@ -866,7 +814,9 @@ In that case, insert the number."
     (interactive)
     (shell-command (concat
                     "org-ruby " "--translate " "markdown " "-a "
-                    (buffer-name))))
+                    (buffer-name)
+                    " 2>/dev/null "
+                    )))
   (defalias 'op 'org-publish-to-hexo)
 
   (defun buffer-contains-substring (string)
@@ -874,7 +824,6 @@ In that case, insert the number."
       (save-match-data
         (goto-char (point-min))
         (search-forward string nil t))))
-
 
   (defun org-auto-publish-save-hook ()
     (when (and (eq major-mode 'org-mode)
@@ -884,6 +833,8 @@ In that case, insert the number."
       (org-publish-to-hexo)))
 
   (add-hook 'after-save-hook #'org-auto-publish-save-hook)
+  (setq org-image-actual-width nil)
+
 
   (defun org-before-save-hook ()
     (when (eq major-mode 'org-mode)
@@ -917,6 +868,17 @@ In that case, insert the number."
   (add-hook 'dired-mode-hook
             (lambda () (local-set-key (kbd "r") 'dired-up-directory)))
 
+
+  (add-to-load-path "~/.emacs.d/private/local/org2blog/")
+
+  (require 'org2blog)
+  (setq org2blog/wp-blog-alist
+        '(("coderscat.com"
+           :url "http://coderscat.com/xmlrpc.php"
+           :username "admin")))
+
+  (setq 'org2blog/wp-show-post-in-browser t)
+
   )
 
 ;; Do not write anything past this comment. This is where Emacs will
@@ -929,9 +891,10 @@ In that case, insert the number."
  '(global-hl-line-mode t)
  '(highlight-symbol-foreground-color "keyboardFocusIndicatorColor")
  '(highlight-symbol-idle-delay 0.5)
+ '(org2blog/wp-show-post-in-browser (quote show))
  '(package-selected-packages
    (quote
-    (hexo pangu-spacing ox-reveal unicode-escape names org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-mime org-download htmlize gnuplot graphviz-dot-mode powerline hydra avy anzu iedit smartparens highlight evil goto-chg undo-tree projectile async f dash yapfify reveal-in-osx-finder pyvenv pytest pyenv-mode py-isort pip-requirements pbcopy osx-trash osx-dictionary live-py-mode launchctl insert-shebang hy-mode fish-mode cython-mode anaconda-mode pythonic helm-gitignore git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter flyspell-correct-ivy flyspell-correct-helm flyspell-correct diff-hl auto-dictionary helm helm-core zenburn-theme yaml-mode web-mode web-beautify utop tuareg caml toml-mode tagedit stickyfunc-enhance srefactor smeargle slim-mode scss-mode sass-mode rvm ruby-tools ruby-test-mode rubocop rspec-mode robe rbenv racer quickrun pug-mode projectile-rails rake phpunit phpcbf php-extras php-auto-yasnippets orgit ocp-indent nginx-mode mmm-mode minitest merlin markdown-toc magit-gitflow magit-popup lua-mode livid-mode skewer-mode simple-httpd less-css-mode json-mode json-snatcher json-reformat js2-refactor js2-mode js-doc highlight-symbol haml-mode go-guru go-eldoc gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md fuzzy flymake-ruby flymake-easy flycheck-rust flycheck-pos-tip pos-tip flycheck feature-mode evil-magit magit transient git-commit with-editor erlang engine-mode emmet-mode drupal-mode php-mode disaster company-web web-completion-data company-tern dash-functional tern company-statistics company-go go-mode company-c-headers company coffee-mode cmake-mode clojure-snippets clj-refactor inflections edn multiple-cursors paredit peg clang-format cider-eval-sexp-fu cider sesman queue parseedn clojure-mode parseclj a chruby cargo markdown-mode rust-mode bundler inf-ruby auto-yasnippet yasnippet ag ac-ispell auto-complete wgrep smex ivy-hydra lv counsel-projectile counsel swiper ivy ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu elisp-slime-nav dumb-jump diminish define-word column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line))))
+    (metaweblog xml-rpc hexo pangu-spacing ox-reveal unicode-escape names org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-mime org-download htmlize gnuplot graphviz-dot-mode powerline hydra avy anzu iedit smartparens highlight evil goto-chg undo-tree projectile async f dash yapfify reveal-in-osx-finder pyvenv pytest pyenv-mode py-isort pip-requirements pbcopy osx-trash osx-dictionary live-py-mode launchctl insert-shebang hy-mode fish-mode cython-mode anaconda-mode pythonic helm-gitignore git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter flyspell-correct-ivy flyspell-correct-helm flyspell-correct diff-hl auto-dictionary helm helm-core zenburn-theme yaml-mode web-mode web-beautify utop tuareg caml toml-mode tagedit stickyfunc-enhance srefactor smeargle slim-mode scss-mode sass-mode rvm ruby-tools ruby-test-mode rubocop rspec-mode robe rbenv racer quickrun pug-mode projectile-rails rake phpunit phpcbf php-extras php-auto-yasnippets orgit ocp-indent nginx-mode mmm-mode minitest merlin markdown-toc magit-gitflow magit-popup lua-mode livid-mode skewer-mode simple-httpd less-css-mode json-mode json-snatcher json-reformat js2-refactor js2-mode js-doc highlight-symbol haml-mode go-guru go-eldoc gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md fuzzy flymake-ruby flymake-easy flycheck-rust flycheck-pos-tip pos-tip flycheck feature-mode evil-magit magit transient git-commit with-editor erlang engine-mode emmet-mode drupal-mode php-mode disaster company-web web-completion-data company-tern dash-functional tern company-statistics company-go go-mode company-c-headers company coffee-mode cmake-mode clojure-snippets clj-refactor inflections edn multiple-cursors paredit peg clang-format cider-eval-sexp-fu cider sesman queue parseedn clojure-mode parseclj a chruby cargo markdown-mode rust-mode bundler inf-ruby auto-yasnippet yasnippet ag ac-ispell auto-complete wgrep smex ivy-hydra lv counsel-projectile counsel swiper ivy ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu elisp-slime-nav dumb-jump diminish define-word column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
