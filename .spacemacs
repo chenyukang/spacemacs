@@ -819,6 +819,9 @@ In that case, insert the number."
                     )))
   (defalias 'op 'org-publish-to-hexo)
 
+  (setq org-image-actual-width nil)
+  (image-type-available-p 'imagemagick)
+
   (defun buffer-contains-substring (string)
     (save-excursion
       (save-match-data
