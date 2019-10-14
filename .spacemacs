@@ -785,6 +785,7 @@ In that case, insert the number."
   (setq org-reveal-title-slide nil)
 
   (defun auto-indent-minor-mode())
+  (setq org-html-htmlize-output-type nil)
 
   (add-hook 'org-mode-hook
             (lambda ()
@@ -904,3 +905,4 @@ In that case, insert the number."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(highlight-symbol-face ((t (:background "disabledControlTextColor")))))
+
