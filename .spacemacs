@@ -730,7 +730,7 @@ In that case, insert the number."
            "** %^{desc}\n " :empty-lines 1)
 
           ("b" "Blog file" entry (file create-blog-file)
-           "** New Post\n#+CATEGORY:\n#+TAGS:\n#+DESCRIPTION:\n#+ATTR_WP: :syntaxhl light=true\n#+TITLE: %^{desc}\n " :empty-lines 1)
+           "** New Post\n#+BLOG: coderscat.com\n#+DATE: [%U]\n#+CATEGORY:\n#+TAGS:\n#+DESCRIPTION:\n#+ATTR_WP: :syntaxhl light=true\n#+TITLE: %^{desc}\n " :empty-lines 1)
 
           ("j" "Journal" entry (file+datetree "~/Dropbox/org/_journal.org" )
            "** %?\nEntered on %U\n  %i\n" :empty-lines 1)
@@ -784,7 +784,6 @@ In that case, insert the number."
       (message new-file))
     )
   (defalias 'ois 'org-insert-structure-template)
-  (defalias 'oim 'org-insert-image)
 
 
   (add-to-load-path "~/.emacs.d/private/local/org-reveal/")
@@ -892,7 +891,8 @@ In that case, insert the number."
            :username "admin")))
 
   (setq 'org2blog/wp-show-post-in-browser t)
-
+  (defalias 'opb 'org2blog/wp-post-buffer)
+  (defalias 'opbap 'org2blog/wp-post-buffer-and-publish)
   )
 
 ;; Do not write anything past this comment. This is where Emacs will
