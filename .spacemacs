@@ -879,7 +879,7 @@ In that case, insert the number."
   ;; (with-eval-after-load 'helm
   ;;   (setq helm-display-function 'helm-default-display-buffer))
   (add-hook 'dired-mode-hook
-            (lambda () (local-set-key (kbd "r") 'dired-up-directory)))
+            (lambda () (local-set-key (kbd "e") 'dired-up-directory)))
 
 
   (add-to-load-path "~/.emacs.d/private/local/org2blog/")
@@ -904,6 +904,7 @@ In that case, insert the number."
  '(global-hl-line-mode t)
  '(highlight-symbol-foreground-color "keyboardFocusIndicatorColor")
  '(highlight-symbol-idle-delay 0.5)
+ '(org2blog/wp-show-post-in-browser (quote true))
  '(org2blog/wp-use-sourcecode-shortcode nil)
  '(org2blog/wp-use-wp-latex nil)
  '(package-selected-packages
