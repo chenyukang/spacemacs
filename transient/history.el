@@ -1,4 +1,6 @@
-((magit-commit nil)
+((magit-blame
+  ("-w"))
+ (magit-commit nil)
  (magit-log
   (("--" "web/app/models/exam_template.rb")))
  (magit-push nil))
