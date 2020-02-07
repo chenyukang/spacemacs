@@ -714,7 +714,7 @@ In that case, insert the number."
            "** TODO %^{priority|[#A]|[#B]|[#C]} %?\n")
 
           ("e" "Todo for life" entry (file+datetree "~/Dropbox/org/life.org")
-           "** TODO %^{priority|[#A]|[#B]|[#C]} %?\n" :empty-lines 1)
+           "** TODO %?\n  %i\n " :empty-lines 1)
 
           ("l" "Todo for learn" entry (file+datetree "~/Dropbox/org/learn.org")
            "** TODO %?\nEntered on %U\n  %i\n\n " :kill-buffer t :empty-lines 1)
@@ -730,6 +730,9 @@ In that case, insert the number."
 
           ("b" "Blog file" entry (file create-blog-file)
            "** New Post\n#+CATEGORY:\n#+TAGS:\n#+DESCRIPTION:\n#+ATTR_WP: :syntaxhl light=true\n#+TITLE: %^{desc}\n " :empty-lines 1)
+
+          ("B" "Blog file" entry (file create-blog-file)
+           "** New Post\n#+CATEGORY: LeetCode\n#+TAGS: Algorithms, LeetCode\n#+DESCRIPTION:\n#+ATTR_WP: :syntaxhl light=true\n#+TITLE: LeetCode: %^{desc}\n " :empty-lines 1)
 
           ("j" "Journal" entry (file+datetree "~/Dropbox/org/_journal.org" )
            "** %?\nEntered on %U\n  %i\n" :empty-lines 1)
@@ -888,9 +891,12 @@ In that case, insert the number."
   (setq org2blog/wp-blog-alist
         '(("coderscat.com"
            :url "http://coderscat.com/xmlrpc.php"
-           :username "admin")))
+           :username "yukang")))
 
   (setq 'org2blog/wp-show-post-in-browser t)
+
+  (setq-default tab-width 4)
+  (setq indent-tabs-mode nil)
 
   )
 
@@ -904,6 +910,7 @@ In that case, insert the number."
  '(global-hl-line-mode t)
  '(highlight-symbol-foreground-color "keyboardFocusIndicatorColor")
  '(highlight-symbol-idle-delay 0.5)
+ '(org2blog/wp-show-post-in-browser t)
  '(org2blog/wp-use-sourcecode-shortcode nil)
  '(org2blog/wp-use-wp-latex nil)
  '(package-selected-packages
