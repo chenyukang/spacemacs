@@ -902,6 +902,7 @@ In that case, insert the number."
     (kill-region (point) (point-max)))
 
   (defalias 'kb 'kill-whole-buffer)
+  (defalias 'ff 'find-file-at-point)
 
   (defun org-auto-publish-save-hook ()
     (when (and (eq major-mode 'org-mode)
