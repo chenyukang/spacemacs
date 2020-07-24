@@ -867,21 +867,19 @@ In that case, insert the number."
                     )))
   (defalias 'op 'org-publish-to-hexo)
 
-  (require 'org-roam)
-
-  (use-package org-roam
-    :ensure t
-    :hook
-    (after-init . org-roam-mode)
-    :custom
-    (org-roam-directory "/Users/yukang/Dropbox/org/notes/")
-    :bind (:map org-roam-mode-map
-                (("C-c n l" . org-roam)
-                 ("C-c n f" . org-roam-find-file)
-                 ("C-c n g" . org-roam-graph-show))
-                :map org-mode-map
-                (("C-c n i" . org-roam-insert))
-                (("C-c n I" . org-roam-insert-immediate))))
+  ;; (use-package org-roam
+  ;;   :ensure t
+  ;;   :hook
+  ;;   (after-init . org-roam-mode)
+  ;;   :custom
+  ;;   (org-roam-directory "/Users/yukang/Dropbox/org/notes/")
+  ;;   :bind (:map org-roam-mode-map
+  ;;               (("C-c n l" . org-roam)
+  ;;                ("C-c n f" . org-roam-find-file)
+  ;;                ("C-c n g" . org-roam-graph-show))
+  ;;               :map org-mode-map
+  ;;               (("C-c n i" . org-roam-insert))
+  ;;               (("C-c n I" . org-roam-insert-immediate))))
 
 
   (setq org-image-actual-width nil)
@@ -912,6 +910,27 @@ In that case, insert the number."
       (org-publish-to-hexo)))
 
   (add-hook 'after-save-hook #'org-auto-publish-save-hook)
+
+  (set 'async-shell-command-display-buffer nil)
+  (set 'async-shell-command-buffer 'new-buffer)
+
+  (defun org-sync-to-github ()
+    (interactive)
+    (let
+        ((display-buffer-alist
+          (list
+           (cons
+            "\\*Async Shell Command\\*.*"
+            (cons #'display-buffer-no-window nil)))))
+      (async-shell-command "/Users/yukang/Dropbox/org/up.sh 1>/dev/null 2>&1")))
+
+  (defun org-auto-sync-up-to-github ()
+    (when (eq major-mode 'org-mode)
+      (message "Sync to Github")
+      (org-sync-to-github)))
+
+  (add-hook 'after-save-hook #'org-auto-sync-up-to-github)
+
   (setq org-image-actual-width nil)
 
 
@@ -971,7 +990,7 @@ In that case, insert the number."
   (setq google-translate-translation-directions-alist
         '(("en" . "zh-CN") ("zh-CN" . "en")))
 
-  (load-file "~/.emacs.d/snippets/+google-translate-posframe.el")
+  ;;(load-file "~/.emacs.d/snippets/+google-translate-posframe.el")
 
   (setq-default tab-width 4)
   (setq indent-tabs-mode nil)
@@ -984,6 +1003,7 @@ In that case, insert the number."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(async-shell-command-buffer (quote new-buffer))
  '(global-hl-line-mode t)
  '(google-translate-default-target-language "zh-CN")
  '(highlight-symbol-foreground-color "keyboardFocusIndicatorColor")
