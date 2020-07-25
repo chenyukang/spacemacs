@@ -88,7 +88,7 @@ values."
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
    ;; A list of packages that will not be installed and loaded.
-   dotspacemacs-excluded-packages '()
+   dotspacemacs-excluded-packages '(org-projectile)
    ;; Defines the behaviour of Spacemacs when installing packages.
    ;; Possible values are `used-only', `used-but-keep-unused' and `all'.
    ;; `used-only' installs only explicitly used packages and uninstall any
@@ -422,7 +422,7 @@ you should place your code here."
     (interactive)
     (let ((name (concat (format-time-string "%d_%m_%Y_%s_")
                         (read-string "file-name: "))))
-      (find-file (expand-file-name name "/tmp/"))))
+      (find-file (expand-file-name name "~/Dropbox/backup"))))
 
   (defalias 'gt 'gen-temp-file)
 
@@ -680,6 +680,8 @@ In that case, insert the number."
   (setq org-agenda-skip-deadline-if-done t)
   (setq org-agenda-skip-scheduled-if-done t)
   (setq org-startup-with-inline-images nil)
+  (defalias 'post-buffer 'org2blog/wp-post-buffer)
+  (defalias 'publish-buffer 'org2blog/wp-post-buffer-and-publish)
 
 
   (defun create-org-file-with-dir (dir)
