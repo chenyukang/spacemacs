@@ -72,7 +72,6 @@ values."
                                        tuareg
                                        quickrun
                                        merlin
-                                       helm
                                        helm-projectile
                                        unicode-escape
                                        helm-ag
@@ -185,7 +184,7 @@ values."
    dotspacemacs-ex-command-key ":"
    ;; The leader key accessible in `emacs state' and `insert state'
    ;; (default "M-m")
-   dotspacemacs-emacs-leader-key "M-m"
+   dotspacemacs-emacs-leader-key "C-t"
    ;; Major mode leader key is a shortcut key which is the equivalent of
    ;; pressing `<leader> m`. Set it to `nil` to disable it. (default ",")
    dotspacemacs-major-mode-leader-key ","
@@ -422,8 +421,8 @@ you should place your code here."
   (defalias 'r 'recentf-open-files)
   (defalias 'ha 'helm-ag)
   (defalias 'hat 'helm-ag-this-file)
-  (defalias 'ic 'iy-go-to-char)
-  (defalias 'ib 'iy-go-to-char-backward)
+  (defalias 'ic 'evil-avy-goto-char)
+  (defalias 'il 'evil-avy-goto-line)
   (defalias 'w 'windmove-up)
   (defalias 's 'windmove-down)
   (defalias 'd 'windmove-right)
