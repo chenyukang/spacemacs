@@ -90,6 +90,7 @@ values."
                                        dired-narrow
                                        dired-subtree
                                        shell-pop
+                                       ripgrep
                                        )
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
@@ -350,6 +351,8 @@ you should place your code here."
 
   (require 'package)
   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+  ;;(add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
+
   ;; Comment/uncomment this line to enable MELPA Stable if desired.  See `package-archive-priorities`
   ;; and `package-pinned-packages`. Most users will not need or want to do this.
   ;;(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
@@ -411,7 +414,7 @@ you should place your code here."
   (defalias 'uc 'uncomment-region)
   (defalias 'gf 'grep-find)
   (defalias 'pg 'helm-projectile-ag)
-  (defalias 'hg 'projectile-grep)
+  (defalias 'hg 'projectile-ripgrep)
   (defalias 'p  'helm-resume)
   (defalias 'fd 'find-dired)
   (defalias 'e 'eshell)
@@ -419,7 +422,7 @@ you should place your code here."
   (defalias 'r 'recentf-open-files)
   (defalias 'ha 'helm-ag)
   (defalias 'hat 'helm-ag-this-file)
-  (defalias 'i 'iy-go-to-char)
+  (defalias 'ic 'iy-go-to-char)
   (defalias 'ib 'iy-go-to-char-backward)
   (defalias 'w 'windmove-up)
   (defalias 's 'windmove-down)
@@ -654,6 +657,7 @@ In that case, insert the number."
   (add-hook 'rust-mode-hook #'rustfmt-enable-on-save)
   (add-hook 'rust-mode-hook #'rust-enable-format-on-save)
 
+  ;;
   (require 'org)
   (defalias 'ga 'org-agenda)
   (defalias 'gc 'org-capture)
@@ -714,9 +718,6 @@ In that case, insert the number."
                           (read-string "file-name: "))))
         (expand-file-name (format "%s.org" name) dir)))))
 
-  (defun create-meeting-file ()
-    (funcall (create-org-file-with-dir "~/Dropbox/org/meeting/")))
-
   (defun create-note-file()
     (funcall (create-org-file-with-dir "~/Dropbox/org/notes/")))
 
@@ -744,13 +745,10 @@ In that case, insert the number."
           ("l" "Todo for myself" entry (file+datetree "~/Dropbox/org/learn.org")
            "** TODO %?\nEntered on %U\n  %i\n" :empty-lines 1)
 
-          ("M" "Meeting notes" entry (file create-meeting-file)
-           "** %^{desc}\n " :empty-lines 1)
-
           ("N" "Notes file" entry (file create-note-file)
            "** %^{desc}\n " :empty-lines 1)
 
-          ("c" "Company related files" entry (file create-company-file)
+          ("c" "Comapny files" entry (file create-company-file)
            "** %^{desc}\n " :empty-lines 1)
 
           ("b" "Blog file" entry (file create-blog-file)
@@ -811,11 +809,40 @@ In that case, insert the number."
       (message new-file))
     )
   (defalias 'ois 'org-insert-structure-template)
-  
+
   (add-to-load-path "~/.emacs.d/private/local/org-reveal/")
   (require 'ox-reveal)
   (setq org-reveal-root "file:///Users/kang/code/reveal.js")
   (setq org-reveal-title-slide nil)
+
+
+  ;; (load-file "~/.emacs.d/private/local/org-brain/org-brain.el")
+
+  ;; (require 'org-brain)
+  ;; (use-package org-brain :ensure t
+  ;;   :init
+  ;;   (setq org-brain-path "~/Dropbox/org/notes")
+  ;;   ;; For Evil users
+  ;;   (with-eval-after-load 'evil
+  ;;     (evil-set-initial-state 'org-brain-visualize-mode 'emacs))
+  ;;   :config
+  ;;   (bind-key "C-c b" 'org-brain-prefix-map org-mode-map)
+  ;;   (setq org-id-track-globally t)
+  ;;   (setq org-id-locations-file "~/Dropbox/org/.org-id-locations")
+  ;;   (add-hook 'before-save-hook #'org-brain-ensure-ids-in-buffer)
+  ;;   (push '("b" "Brain" plain (function org-brain-goto-end)
+  ;;           "* %i%?" :empty-lines 1)
+  ;;         org-capture-templates)
+  ;;   (setq org-brain-visualize-default-choices 'all)
+  ;;   (setq org-brain-title-max-length 12)
+  ;;   (setq org-brain-include-file-entries nil
+  ;;         org-brain-file-entries-use-title nil))
+
+  ;; Allows you to edit entries directly from org-brain-visualize
+  ;; (use-package polymode
+  ;;   :config
+  ;;   (add-hook 'org-brain-visualize-mode-hook #'org-brain-polymode))
+
 
   ;; (add-to-load-path "~/.emacs.d/elpa/dired-hacks")
   ;; (require 'dired-subtree)
@@ -867,6 +894,7 @@ In that case, insert the number."
                     )))
   (defalias 'op 'org-publish-to-hexo)
 
+  ;; (require 'org-roam)
   ;; (use-package org-roam
   ;;   :ensure t
   ;;   :hook
@@ -884,6 +912,27 @@ In that case, insert the number."
 
   (setq org-image-actual-width nil)
   (image-type-available-p 'imagemagick)
+
+
+  (require 'ox-publish)    ;C-x C-e to load org-publish
+  (setq org-publish-project-alist
+        '(
+          ("notes-source"                         ;org-source files to be transformed into html files
+           :base-directory "~/Dropbox/org/notes/"
+           :base-extension "org"
+           :publishing-directory "~/Dropbox/org/html_notes/"
+           :recursive t
+           :publishing-function org-html-publish-to-html
+           :table-of-contents nil               ;nil fail, generated TOC
+           :with-toc nil                        ;nil pass, did not generate TOC
+           :headline-levels 4
+           :section-numbers nil                 ;nil pass, generated headings without sections numbers
+           :html-head-include-default-style nil ;nil pass, did not generate 160-lines of commented style
+           :org-html-postamble nil              ;nil fail, postamble was generated
+           )
+          ("org" :components ("notes-source"))
+          ))                 ;C-x C-e and repeat after every change to org-publish-project-alist
+                                        ;to publish: SPC u SPC SPC org-publish-project
 
   (defun buffer-contains-substring (string)
     (save-excursion
@@ -913,7 +962,6 @@ In that case, insert the number."
 
   (set 'async-shell-command-display-buffer nil)
   (set 'async-shell-command-buffer 'new-buffer)
-
   (defun org-sync-to-github ()
     (interactive)
     (let
@@ -929,7 +977,7 @@ In that case, insert the number."
       (message "Sync to Github")
       (org-sync-to-github)))
 
-  (add-hook 'after-save-hook #'org-auto-sync-up-to-github)
+  ;;(add-hook 'after-save-hook #'org-auto-sync-up-to-github)
 
   (setq org-image-actual-width nil)
 
@@ -1017,11 +1065,10 @@ In that case, insert the number."
  '(org2blog/wp-use-wp-latex nil)
  '(package-selected-packages
    (quote
-    (emacsql-sqlite3 org-roam csv-mode dired-subtree shell-pop org-projectile dired-narrow dired-filter writegood-mode org2blog metaweblog xml-rpc pangu-spacing ox-reveal unicode-escape names org-category-capture org-present org-pomodoro alert log4e gntp org-mime org-download htmlize gnuplot graphviz-dot-mode powerline hydra avy anzu iedit smartparens highlight evil goto-chg undo-tree projectile async f dash yapfify reveal-in-osx-finder pyvenv pytest pyenv-mode py-isort pip-requirements pbcopy osx-trash osx-dictionary live-py-mode launchctl insert-shebang hy-mode fish-mode cython-mode anaconda-mode pythonic helm-gitignore git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter flyspell-correct-ivy flyspell-correct-helm flyspell-correct diff-hl auto-dictionary helm helm-core zenburn-theme yaml-mode web-mode web-beautify utop tuareg caml toml-mode tagedit stickyfunc-enhance srefactor smeargle slim-mode scss-mode sass-mode rvm ruby-tools ruby-test-mode rubocop rspec-mode robe rbenv racer quickrun pug-mode projectile-rails rake phpunit phpcbf php-extras php-auto-yasnippets orgit ocp-indent nginx-mode mmm-mode minitest merlin markdown-toc magit-gitflow magit-popup lua-mode livid-mode skewer-mode simple-httpd less-css-mode json-mode json-snatcher json-reformat js2-refactor js2-mode js-doc highlight-symbol haml-mode go-guru go-eldoc gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md fuzzy flymake-ruby flymake-easy flycheck-rust flycheck-pos-tip pos-tip flycheck feature-mode evil-magit magit transient git-commit with-editor erlang engine-mode emmet-mode drupal-mode php-mode disaster company-web web-completion-data company-tern dash-functional tern company-statistics company-go go-mode company-c-headers company coffee-mode cmake-mode clojure-snippets clj-refactor inflections edn multiple-cursors paredit peg clang-format cider-eval-sexp-fu cider sesman queue parseedn clojure-mode parseclj a chruby cargo markdown-mode rust-mode bundler inf-ruby auto-yasnippet yasnippet ag ac-ispell auto-complete wgrep smex ivy-hydra lv counsel-projectile counsel swiper ivy ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu elisp-slime-nav dumb-jump diminish define-word column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line))))
+    (ripgrep emacsql-sqlite3 csv-mode dired-subtree shell-pop org-projectile dired-narrow dired-filter writegood-mode org2blog metaweblog xml-rpc pangu-spacing ox-reveal unicode-escape names org-category-capture org-present org-pomodoro alert log4e gntp org-mime org-download htmlize gnuplot graphviz-dot-mode powerline hydra avy anzu iedit smartparens highlight evil goto-chg undo-tree projectile async f dash yapfify reveal-in-osx-finder pyvenv pytest pyenv-mode py-isort pip-requirements pbcopy osx-trash osx-dictionary live-py-mode launchctl insert-shebang hy-mode fish-mode cython-mode anaconda-mode pythonic helm-gitignore git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter flyspell-correct-ivy flyspell-correct-helm flyspell-correct diff-hl auto-dictionary helm helm-core zenburn-theme yaml-mode web-mode web-beautify utop tuareg caml toml-mode tagedit stickyfunc-enhance srefactor smeargle slim-mode scss-mode sass-mode rvm ruby-tools ruby-test-mode rubocop rspec-mode robe rbenv racer quickrun pug-mode projectile-rails rake phpunit phpcbf php-extras php-auto-yasnippets orgit ocp-indent nginx-mode mmm-mode minitest merlin markdown-toc magit-gitflow magit-popup lua-mode livid-mode skewer-mode simple-httpd less-css-mode json-mode json-snatcher json-reformat js2-refactor js2-mode js-doc highlight-symbol haml-mode go-guru go-eldoc gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md fuzzy flymake-ruby flymake-easy flycheck-rust flycheck-pos-tip pos-tip flycheck feature-mode evil-magit magit transient git-commit with-editor erlang engine-mode emmet-mode drupal-mode php-mode disaster company-web web-completion-data company-tern dash-functional tern company-statistics company-go go-mode company-c-headers company coffee-mode cmake-mode clojure-snippets clj-refactor inflections edn multiple-cursors paredit peg clang-format cider-eval-sexp-fu cider sesman queue parseedn clojure-mode parseclj a chruby cargo markdown-mode rust-mode bundler inf-ruby auto-yasnippet yasnippet ag ac-ispell auto-complete wgrep smex ivy-hydra lv swiper ivy ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu elisp-slime-nav dumb-jump diminish define-word column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(highlight-symbol-face ((t (:background "disabledControlTextColor")))))
-
+ )
