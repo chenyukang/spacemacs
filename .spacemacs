@@ -856,7 +856,7 @@ In that case, insert the number."
   (setq org-html-htmlize-output-type nil)
 
 
-  (load-file "~/.emacs.d/private/local/emacs-grammarly/emacs-grammarly.el")
+  ;;(load-file "~/.emacs.d/private/local/emacs-grammarly/emacs-grammarly.el")
 
   (add-hook 'org-mode-hook
             (lambda ()
@@ -1041,6 +1041,11 @@ In that case, insert the number."
 
   (setq-default tab-width 4)
   (setq indent-tabs-mode nil)
+
+  (add-hook 'c++-mode-hook (lambda () (setq
+                                       flycheck-gcc-language-standard "c++11"
+                                       flycheck-clang-language-standard "c++11")))
+
   )
 
 ;; Do not write anything past this comment. This is where Emacs will
