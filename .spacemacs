@@ -94,9 +94,7 @@ values."
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
    ;; A list of packages that will not be installed and loaded.
-   dotspacemacs-excluded-packages '(
-                                    org-projectile
-                                    )
+   dotspacemacs-excluded-packages '(org-projectile)
    ;; Defines the behaviour of Spacemacs when installing packages.
    ;; Possible values are `used-only', `used-but-keep-unused' and `all'.
    ;; `used-only' installs only explicitly used packages and uninstall any
@@ -707,6 +705,8 @@ In that case, insert the number."
   (setq org-agenda-skip-deadline-if-done t)
   (setq org-agenda-skip-scheduled-if-done t)
   (setq org-startup-with-inline-images nil)
+  (defalias 'post-buffer 'org2blog/wp-post-buffer)
+  (defalias 'publish-buffer 'org2blog/wp-post-buffer-and-publish)
 
 
   (defun create-org-file-with-dir (dir)
@@ -827,7 +827,7 @@ In that case, insert the number."
   (setq org-html-htmlize-output-type nil)
 
 
-  (load-file "~/.emacs.d/private/local/emacs-grammarly/emacs-grammarly.el")
+  ;;(load-file "~/.emacs.d/private/local/emacs-grammarly/emacs-grammarly.el")
 
   (add-hook 'org-mode-hook
             (lambda ()
@@ -940,7 +940,7 @@ In that case, insert the number."
            (cons
             "\\*Async Shell Command\\*.*"
             (cons #'display-buffer-no-window nil)))))
-      (async-shell-command "/Users/yukang/Dropbox/org/up.sh 1>/dev/null 2>&1")))
+      (async-shell-command "~/Dropbox/org/up.sh 1>/dev/null 2>&1")))
 
   (defun org-auto-sync-up-to-github ()
     (when (eq major-mode 'org-mode)
@@ -1012,6 +1012,11 @@ In that case, insert the number."
 
   (setq-default tab-width 4)
   (setq indent-tabs-mode nil)
+
+  (add-hook 'c++-mode-hook (lambda () (setq
+                                       flycheck-gcc-language-standard "c++11"
+                                       flycheck-clang-language-standard "c++11")))
+
   )
 
 ;; Do not write anything past this comment. This is where Emacs will
@@ -1023,7 +1028,7 @@ In that case, insert the number."
  ;; If there is more than one, they won't work right.
  '(async-shell-command-buffer (quote new-buffer))
  '(global-hl-line-mode t)
- '(google-translate-default-target-language "zh-CN")
+ '(google-translate-default-target-language "zh-CN" t)
  '(highlight-symbol-foreground-color "keyboardFocusIndicatorColor")
  '(highlight-symbol-idle-delay 0.5)
  '(org-agenda-files
