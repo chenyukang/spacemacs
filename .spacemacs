@@ -783,7 +783,7 @@ In that case, insert the number."
     (let* ((path (concat default-directory "img/"))
            (image-file (concat
                         path
-                        (buffer-name)
+                        (s-replace "CAPTURE-" "" (buffer-name))
                         (format-time-string "_%Y%m%d_%H%M%S.png"))))
       (if (not (file-exists-p path))
           (mkdir path))
@@ -813,35 +813,6 @@ In that case, insert the number."
   (require 'ox-reveal)
   (setq org-reveal-root "file:///Users/kang/code/reveal.js")
   (setq org-reveal-title-slide nil)
-
-
-  ;; (load-file "~/.emacs.d/private/local/org-brain/org-brain.el")
-
-  ;; (require 'org-brain)
-  ;; (use-package org-brain :ensure t
-  ;;   :init
-  ;;   (setq org-brain-path "~/Dropbox/org/notes")
-  ;;   ;; For Evil users
-  ;;   (with-eval-after-load 'evil
-  ;;     (evil-set-initial-state 'org-brain-visualize-mode 'emacs))
-  ;;   :config
-  ;;   (bind-key "C-c b" 'org-brain-prefix-map org-mode-map)
-  ;;   (setq org-id-track-globally t)
-  ;;   (setq org-id-locations-file "~/Dropbox/org/.org-id-locations")
-  ;;   (add-hook 'before-save-hook #'org-brain-ensure-ids-in-buffer)
-  ;;   (push '("b" "Brain" plain (function org-brain-goto-end)
-  ;;           "* %i%?" :empty-lines 1)
-  ;;         org-capture-templates)
-  ;;   (setq org-brain-visualize-default-choices 'all)
-  ;;   (setq org-brain-title-max-length 12)
-  ;;   (setq org-brain-include-file-entries nil
-  ;;         org-brain-file-entries-use-title nil))
-
-  ;; Allows you to edit entries directly from org-brain-visualize
-  ;; (use-package polymode
-  ;;   :config
-  ;;   (add-hook 'org-brain-visualize-mode-hook #'org-brain-polymode))
-
 
   ;; (add-to-load-path "~/.emacs.d/elpa/dired-hacks")
   ;; (require 'dired-subtree)
