@@ -703,7 +703,6 @@ In that case, insert the number."
   (require 'org-bullets)
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
   (setq org-agenda-files (list "~/Dropbox/org/work.org"
-                               "~/Dropbox/org/life.org"
                                "~/Dropbox/org/habit.org"
                                "~/Dropbox/org/learn.org"))
 
