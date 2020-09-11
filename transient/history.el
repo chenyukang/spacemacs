@@ -1,5 +1,6 @@
 ((magit-blame
   ("-w"))
+ (magit-branch nil)
  (magit-commit nil)
  (magit-diff nil
              ("--no-ext-diff" "--stat"))
