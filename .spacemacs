@@ -671,7 +671,7 @@ In that case, insert the number."
   (defalias 'of 'org-fill-paragraph)
   (defalias 'ol 'org-insert-link)
 
-  (setq org-image-actual-width '(500))
+  (setq org-image-actual-width '(200 200))
 
   (define-key global-map "\C-cl" 'smex)
   (define-key global-map "\C-ca" 'org-agenda)
@@ -744,8 +744,7 @@ In that case, insert the number."
     (format-time-string "~/Dropbox/org/journals/%Y_%m_%d.org"))
 
   (setq org-capture-templates
-        '(
-          ("t" "Todo" entry (file+datetree "~/Dropbox/org/work.org")
+        '(("t" "Todo" entry (file+datetree "~/Dropbox/org/work.org")
            "** TODO %?\n  %i\n " :empty-lines 1)
 
           ("x" "Todo with priority, for work" entry (file+datetree "~/Dropbox/org/work.org")
@@ -763,11 +762,14 @@ In that case, insert the number."
           ("c" "Comapny files" entry (file create-company-file)
            "** %^{desc}\n " :empty-lines 1)
 
-          ("b" "Blog file" entry (file create-blog-file)
-           "** New Post\n#+BLOG: coderscat.com\n#+CATEGORY:\n#+TAGS:\n#+DESCRIPTION:\n#+ATTR_WP: :syntaxhl light=true\n#+TITLE: %^{desc}\n " :empty-lines 1)
+          ("B" "Blog file" entry (file create-blog-file)
+           (concat "** New Post\n#+BLOG: coderscat.com\n#+CATEGORY:\n#+TAGS:\n#+DESCRIPTION:\n"
+                   "#+ATTR_WP: :syntaxhl light=true\n#+TITLE: %^{desc}\n ") :empty-lines 1)
 
           ("L" "Blog(LeetCode) file" entry (file create-blog-file)
-           "** New Post\n#+CATEGORY: LeetCode\n#+TAGS: Algorithms, LeetCode\n#+DESCRIPTION:\n#+ATTR_WP: :syntaxhl light=true\n#+TITLE: LeetCode: %^{desc}\n " :empty-lines 1)
+           (concat "** New Post\n#+CATEGORY: LeetCode\n#+TAGS: Algorithms, LeetCode\n"
+                   "#+DESCRIPTION:\n#+ATTR_WP: :syntaxhl light=true\n#+TITLE: LeetCode: %^{desc}\n "
+                   :empty-lines 1)
 
           ("j" "Journal" entry (file+datetree "~/Dropbox/org/journals/_journal.org" )
            "** %?\nEntered on %U\n  %i\n" :empty-lines 1)
@@ -800,6 +802,7 @@ In that case, insert the number."
       (shell-command (concat "pngpaste " image-file))
       (org-insert-link nil (concat "file:" image-file) ""))
     (org-display-inline-images) ;; inline 显示图片
+    (setq org-image-actual-width '(200 200))
     )
 
   (defalias 'oim 'org-insert-image)
