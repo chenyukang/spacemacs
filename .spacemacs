@@ -714,10 +714,9 @@ In that case, insert the number."
 
   (setq org-agenda-skip-deadline-if-done t)
   (setq org-agenda-skip-scheduled-if-done t)
-  (setq org-startup-with-inline-images nil)
+  (setq org-startup-with-inline-images t)
   (defalias 'post-buffer 'org2blog/wp-post-buffer)
   (defalias 'publish-buffer 'org2blog/wp-post-buffer-and-publish)
-
 
   (defun create-org-file-with-dir (dir)
     (lexical-let ((dir dir))
@@ -768,7 +767,7 @@ In that case, insert the number."
 
           ("L" "Blog(LeetCode) file" entry (file create-blog-file)
            (concat "** New Post\n#+CATEGORY: LeetCode\n#+TAGS: Algorithms, LeetCode\n"
-                   "#+DESCRIPTION:\n#+ATTR_WP: :syntaxhl light=true\n#+TITLE: LeetCode: %^{desc}\n "
+                   "#+DESCRIPTION:\n#+ATTR_WP: :syntaxhl light=true\n#+TITLE: LeetCode: %^{desc}\n ")
                    :empty-lines 1)
 
           ("j" "Journal" entry (file+datetree "~/Dropbox/org/journals/_journal.org" )
