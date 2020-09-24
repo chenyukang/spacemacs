@@ -31,6 +31,7 @@ values."
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
    '(
+     markdown
      go
      yaml
      csv
@@ -94,11 +95,13 @@ values."
                                        dired-subtree
                                        shell-pop
                                        ripgrep
+                                       visual-fill-column
+                                       olivetti
                                        )
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
    ;; A list of packages that will not be installed and loaded.
-   dotspacemacs-excluded-packages '(org-projectile)
+   dotspacemacs-excluded-packages '(org-projectile adaptive-wrap)
    ;; Defines the behaviour of Spacemacs when installing packages.
    ;; Possible values are `used-only', `used-but-keep-unused' and `all'.
    ;; `used-only' installs only explicitly used packages and uninstall any
@@ -671,8 +674,6 @@ In that case, insert the number."
   (defalias 'of 'org-fill-paragraph)
   (defalias 'ol 'org-insert-link)
 
-  (setq org-image-actual-width '(200 200))
-
   (define-key global-map "\C-cl" 'smex)
   (define-key global-map "\C-ca" 'org-agenda)
   (setq org-log-done t)
@@ -699,14 +700,12 @@ In that case, insert the number."
         '((sequence "TODO(t)" "HAND(h)" "VERIFY(v)" "|" "DONE(d)")
           (sequence "|" "CANCELED(c)")))
 
-  (setq org-image-actual-width 300)
   (setf org-todo-keyword-faces '(("TODO" . (:foreground "white" :background "#95A5A6"   :weight bold))
                                  ("HAND" . (:foreground "white" :background "#2E8B57"  :weight bold))
                                  ("VERIFY" . (:foreground "orange" :background "#2F0B57"  :weight bold))
                                  ("DONE" . (:foreground "white" :background "#3498DB" :weight bold))))
 
   (require 'org-bullets)
-  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
   (setq org-agenda-files (list "~/Dropbox/org/work.org"
                                "~/Dropbox/org/habit.org"
                                "~/Dropbox/org/ideas.org"
@@ -714,7 +713,7 @@ In that case, insert the number."
 
   (setq org-agenda-skip-deadline-if-done t)
   (setq org-agenda-skip-scheduled-if-done t)
-  (setq org-startup-with-inline-images t)
+  ;;(setq org-startup-with-inline-images t)
   (defalias 'post-buffer 'org2blog/wp-post-buffer)
   (defalias 'publish-buffer 'org2blog/wp-post-buffer-and-publish)
 
@@ -733,14 +732,14 @@ In that case, insert the number."
     (funcall (create-org-file-with-dir "~/Dropbox/org/snippets/")))
 
   (defun create-blog-file ()
-    (funcall (create-org-file-with-dir "~/Dropbox/org/blog/")))
+    (funcall (create-org-file-with-dir "~/Dropbox/org/notes/blog/")))
 
   (defun create-company-file ()
     (funcall (create-org-file-with-dir "~/Dropbox/org/company/")))
 
   (defun gen-date-file ()
     "Create an org file in ~/notes/snippets."
-    (format-time-string "~/Dropbox/org/journals/%Y_%m_%d.org"))
+    (format-time-string "~/Dropbox/org/notes/journals/%Y_%m_%d.org"))
 
   (setq org-capture-templates
         '(("t" "Todo" entry (file+datetree "~/Dropbox/org/work.org")
@@ -755,20 +754,17 @@ In that case, insert the number."
           ("i" "Ideas for future writing" entry (file+datetree "~/Dropbox/org/ideas.org")
            "** TODO %?\nEntered on %U\n  %i\n" :empty-lines 1)
 
-          ("N" "Notes file" entry (file create-note-file)
+          ("n" "Notes file" entry (file create-note-file)
            "** %^{desc}\n " :empty-lines 1)
 
           ("c" "Comapny files" entry (file create-company-file)
            "** %^{desc}\n " :empty-lines 1)
 
           ("B" "Blog file" entry (file create-blog-file)
-           (concat "** New Post\n#+BLOG: coderscat.com\n#+CATEGORY:\n#+TAGS:\n#+DESCRIPTION:\n"
-                   "#+ATTR_WP: :syntaxhl light=true\n#+TITLE: %^{desc}\n ") :empty-lines 1)
+           "** New Post\n#+BLOG: coderscat.com\n#+CATEGORY:\n#+TAGS:\n#+DESCRIPTION:\n#+ATTR_WP: :syntaxhl light=true\n#+TITLE: %^{title}\n" :empty-lines 1)
 
           ("L" "Blog(LeetCode) file" entry (file create-blog-file)
-           (concat "** New Post\n#+CATEGORY: LeetCode\n#+TAGS: Algorithms, LeetCode\n"
-                   "#+DESCRIPTION:\n#+ATTR_WP: :syntaxhl light=true\n#+TITLE: LeetCode: %^{desc}\n ")
-                   :empty-lines 1)
+           "** New Post\n#+CATEGORY: LeetCode\n#+TAGS: Algorithms, LeetCode\n#+DESCRIPTION:\n#+ATTR_WP: :syntaxhl light=true\n#+TITLE: LeetCode: %^{title}\n" :empty-lines 1)
 
           ("j" "Journal" entry (file+datetree "~/Dropbox/org/journals/_journal.org" )
            "** %?\nEntered on %U\n  %i\n" :empty-lines 1)
@@ -789,6 +785,20 @@ In that case, insert the number."
     ;; Please note ispell-extra-args contains ACTUAL parameters passed to aspell
   (setq ispell-extra-args '("--sug-mode=ultra" "--lang=en_US"))
 
+  (defun my/change-window-width (width)
+    "Adjust margins so that window is centered"
+    (interactive "NWindow width: ")
+    (if (= 0 width)
+        (set-window-margins nil 0 0)
+      (let* ((cur-width (window-width))
+             (cur-m (window-margins))
+             (cur-l (if (and cur-m (car cur-m)) (car cur-m) 0))
+             (cur-r (if (and cur-m (cdr cur-m)) (cdr cur-m) 0))
+             (lr (- (+ cur-l cur-r cur-width) width))
+             (left (/ lr 2))
+             (right (if (= 0 (% lr 2)) left (1+ left))))
+        (set-window-margins nil (max left 0) (max right 0)))))
+
   (defun org-insert-image ()
     (interactive)
     (let* ((path (concat default-directory "img/"))
@@ -801,8 +811,9 @@ In that case, insert the number."
       (shell-command (concat "pngpaste " image-file))
       (org-insert-link nil (concat "file:" image-file) ""))
     (org-display-inline-images) ;; inline 显示图片
-    (setq org-image-actual-width '(200 200))
     )
+
+  (setq org-image-actual-width '(200 200))
 
   (defalias 'oim 'org-insert-image)
 
@@ -840,30 +851,43 @@ In that case, insert the number."
   (defun auto-indent-minor-mode())
   (setq org-html-htmlize-output-type nil)
 
-
   ;;(load-file "~/.emacs.d/private/local/emacs-grammarly/emacs-grammarly.el")
 
+  ;;(require 'visual-fill-column)
+  ;;(require 'olivetti)
+  (add-hook 'visual-line-mode-hook 'visual-fill-column-mode)
+  (with-eval-after-load 'visual-fill-column
+    (add-hook 'visual-fill-column-mode-hook 'spacemacs/toggle-visual-line-navigation-on)
+    (setq split-window-preferred-function 'visual-fill-column-split-window-sensibly)
+    (advice-add 'text-scale-adjust :after 'visual-fill-column-adjust))
   (add-hook 'org-mode-hook
             (lambda ()
               ;; Enable fill column indicator
               ;;(fci-mode t)
-              (linum-mode -1)
+              ;;(linum-mode -1)
               ;; Set fill column to 79
-              (setq fill-column 90)
-              ;;(org-indent-mode)
-              ;;(visual-line-mode)
+              (setq fill-column 120)
+              ;;(olivetti-mode)
+              ;;(olivetti-set-width 100)
+              (visual-line-mode)
+              ;;(my/change-window-width 120)
+              ;;(message "hello")
+              (define-key org-mode-map "\C-cm" 'org-show-three-levels)
+              (org-bullets-mode 1)
+              (setq org-indent-indentation-per-level 1)
+              ;;(visual-fill-column-mode)
               ;; Enable automatic line wrapping at fill column
-              (auto-fill-mode t)))
+              ;;(auto-fill-mode t)
+              ))
+
+  (add-hook 'org-mode-hook #'visual-line-mode)
+
 
   (setq org-startup-folded "showall")
 
   (defun org-show-three-levels ()
     (interactive)
     (org-content 3))
-
-  (add-hook 'org-mode-hook
-            (lambda ()
-              (define-key org-mode-map "\C-cm" 'org-show-three-levels)))
 
   (require 'pangu-spacing)
   (global-pangu-spacing-mode 1)
@@ -878,7 +902,6 @@ In that case, insert the number."
                     )))
   (defalias 'op 'org-publish-to-hexo)
 
-  (setq org-image-actual-width '(300 300))
   (defalias 'om 'org-toggle-inline-images)
 
   (setq org-hide-emphasis-markers t)
@@ -948,9 +971,6 @@ In that case, insert the number."
 
   ;;(add-hook 'after-save-hook #'org-auto-sync-up-to-github)
 
-  (setq org-image-actual-width nil)
-
-
   (defun org-before-save-hook ()
     (when (eq major-mode 'org-mode)
       (message "saving org-file")
@@ -983,7 +1003,7 @@ In that case, insert the number."
   (add-hook 'dired-mode-hook
             (lambda ()
               (local-set-key (kbd "e") 'dired-up-directory)
-              (setq dired-listing-switches "-alr")
+              (setq dired-listing-switches "-lt")
               (setq dired-omit-files "^\\...+$")
               ;;(setq dired-omit-mode t)
               ))
@@ -1029,25 +1049,22 @@ In that case, insert the number."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(async-shell-command-buffer (quote new-buffer))
+ '(async-shell-command-buffer 'new-buffer)
  '(custom-safe-themes
-   (quote
-    ("fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" "f56eb33cd9f1e49c5df0080a3e8a292e83890a61a89bceeaa481a5f183e8e3ef" default)))
+   '("fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" "f56eb33cd9f1e49c5df0080a3e8a292e83890a61a89bceeaa481a5f183e8e3ef" default))
  '(evil-want-Y-yank-to-eol nil)
  '(global-hl-line-mode t)
  '(google-translate-default-target-language "zh-CN")
  '(highlight-symbol-foreground-color "keyboardFocusIndicatorColor")
  '(highlight-symbol-idle-delay 0.5)
  '(org-agenda-files
-   (quote
-    ("~/Dropbox/org/work.org" "~/Dropbox/org/habit.org" "~/Dropbox/org/learn.org" "~/Dropbox/org/ideas.org")))
+   '("~/Dropbox/org/work.org" "~/Dropbox/org/habit.org" "~/Dropbox/org/learn.org" "~/Dropbox/org/ideas.org"))
  '(org2blog/wp-image-upload t)
  '(org2blog/wp-show-post-in-browser t)
  '(org2blog/wp-use-sourcecode-shortcode nil)
  '(org2blog/wp-use-wp-latex nil)
  '(package-selected-packages
-   (quote
-    (dockerfile-mode ripgrep emacsql-sqlite3 csv-mode dired-subtree shell-pop org-projectile dired-narrow dired-filter writegood-mode org2blog metaweblog xml-rpc pangu-spacing ox-reveal unicode-escape names org-category-capture org-present org-pomodoro alert log4e gntp org-mime org-download htmlize gnuplot graphviz-dot-mode powerline hydra avy anzu iedit smartparens highlight evil goto-chg undo-tree projectile async f dash yapfify reveal-in-osx-finder pyvenv pytest pyenv-mode py-isort pip-requirements pbcopy osx-trash osx-dictionary live-py-mode launchctl insert-shebang hy-mode fish-mode cython-mode anaconda-mode pythonic helm-gitignore git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter flyspell-correct-ivy flyspell-correct-helm flyspell-correct diff-hl auto-dictionary helm helm-core zenburn-theme yaml-mode web-mode web-beautify utop tuareg caml toml-mode tagedit stickyfunc-enhance srefactor smeargle slim-mode scss-mode sass-mode rvm ruby-tools ruby-test-mode rubocop rspec-mode robe rbenv racer quickrun pug-mode projectile-rails rake phpunit phpcbf php-extras php-auto-yasnippets orgit ocp-indent nginx-mode mmm-mode minitest merlin markdown-toc magit-gitflow magit-popup lua-mode livid-mode skewer-mode simple-httpd less-css-mode json-mode json-snatcher json-reformat js2-refactor js2-mode js-doc highlight-symbol haml-mode go-guru go-eldoc gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md fuzzy flymake-ruby flymake-easy flycheck-rust flycheck-pos-tip pos-tip flycheck feature-mode evil-magit magit transient git-commit with-editor erlang engine-mode emmet-mode drupal-mode php-mode disaster company-web web-completion-data company-tern dash-functional tern company-statistics company-go go-mode company-c-headers company coffee-mode cmake-mode clojure-snippets clj-refactor inflections edn multiple-cursors paredit peg clang-format cider-eval-sexp-fu cider sesman queue parseedn clojure-mode parseclj a chruby cargo markdown-mode rust-mode bundler inf-ruby auto-yasnippet yasnippet ag ac-ispell auto-complete wgrep smex ivy-hydra lv swiper ivy ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu elisp-slime-nav dumb-jump diminish define-word column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line))))
+   '(olivetti visual-fill-column dockerfile-mode ripgrep emacsql-sqlite3 csv-mode dired-subtree shell-pop org-projectile dired-narrow dired-filter writegood-mode org2blog metaweblog xml-rpc pangu-spacing ox-reveal unicode-escape names org-category-capture org-present org-pomodoro alert log4e gntp org-mime org-download htmlize gnuplot graphviz-dot-mode powerline hydra avy anzu iedit smartparens highlight evil goto-chg undo-tree projectile async f dash yapfify reveal-in-osx-finder pyvenv pytest pyenv-mode py-isort pip-requirements pbcopy osx-trash osx-dictionary live-py-mode launchctl insert-shebang hy-mode fish-mode cython-mode anaconda-mode pythonic helm-gitignore git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter flyspell-correct-ivy flyspell-correct-helm flyspell-correct diff-hl auto-dictionary helm helm-core zenburn-theme yaml-mode web-mode web-beautify utop tuareg caml toml-mode tagedit stickyfunc-enhance srefactor smeargle slim-mode scss-mode sass-mode rvm ruby-tools ruby-test-mode rubocop rspec-mode robe rbenv racer quickrun pug-mode projectile-rails rake phpunit phpcbf php-extras php-auto-yasnippets orgit ocp-indent nginx-mode mmm-mode minitest merlin markdown-toc magit-gitflow magit-popup lua-mode livid-mode skewer-mode simple-httpd less-css-mode json-mode json-snatcher json-reformat js2-refactor js2-mode js-doc highlight-symbol haml-mode go-guru go-eldoc gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md fuzzy flymake-ruby flymake-easy flycheck-rust flycheck-pos-tip pos-tip flycheck feature-mode evil-magit magit transient git-commit with-editor erlang engine-mode emmet-mode drupal-mode php-mode disaster company-web web-completion-data company-tern dash-functional tern company-statistics company-go go-mode company-c-headers company coffee-mode cmake-mode clojure-snippets clj-refactor inflections edn multiple-cursors paredit peg clang-format cider-eval-sexp-fu cider sesman queue parseedn clojure-mode parseclj a chruby cargo markdown-mode rust-mode bundler inf-ruby auto-yasnippet yasnippet ag ac-ispell auto-complete wgrep smex ivy-hydra lv swiper ivy ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint info+ indent-guide hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate flx-ido fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu elisp-slime-nav dumb-jump diminish define-word column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
