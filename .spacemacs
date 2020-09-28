@@ -884,6 +884,10 @@ In that case, insert the number."
 
   (add-hook 'org-mode-hook #'visual-line-mode)
 
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((python . t)))
+
 
   (setq org-startup-folded "showall")
 
